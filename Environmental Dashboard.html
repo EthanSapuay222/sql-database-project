@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EcoTrack Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              "brand-header": "#af8f6e",
+              "brand-card": "#6d824d",
+              "brand-background-left": "#ffffff",
+              "brand-background-right": "#f3f4e1",
+              "brand-accent": "#6dd9e8",
+            },
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .main-dashboard-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        padding: 2rem;
+        background: linear-gradient(
+          to right,
+          var(--brand-background-left) 50%,
+          var(--brand-background-right) 50%
+        );
+      }
+
+      @media (min-width: 1024px) {
+        .main-dashboard-grid {
+          grid-template-columns: 1fr 1fr; /* 50% split */
+        }
+      }
+    </style>
+  </head>
+  <body class="min-h-screen">
+    <header
+      class="h-20 bg-brand-header text-white flex items-center justify-between p-4 shadow-lg"
+    >
+      <a href="FP.html" class="flex items-center space-x-4 cursor-pointer">
+        <div
+          class="h-8 w-8 bg-white rounded-full flex items-center justify-center"
+        >
+          <svg
+            class="h-6 w-6 text-brand-card"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </div>
+        <span id="logo-text" class="text-xl font-semibold text-gray-800"
+          >EcoTrack</span
+        >
+      </a>
+      <h1
+        class="text-3xl font-bold text-gray-800 tracking-wider text-green-700"
+      >
+        Dashboard Page
+      </h1>
+      <a
+        href="FP.html"
+        class="px-4 py-2 bg-brand-card text-white rounded-lg hover:bg-opacity-90 transition duration-150 ease-in-out font-medium shadow-md"
+      >
+        Back to Main Page
+      </a>
+    </header>
+
+    <main class="main-dashboard-grid">
+      <div class="left-panel">
+        <h2 class="text-2xl font-bold mb-6 text-gray-800">Dashboard</h2>
+
+        <div
+          id="user-id-display"
+          class="text-sm p-2 bg-gray-100 rounded-md mb-4 text-gray-600"
+        >
+          <span class="font-bold">Status:</span> Initializing...
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-10">
+          <div
+            class="p-4 rounded-lg shadow-md bg-brand-card text-white text-center"
+          >
+            <div class="text-sm font-light opacity-80">Total Reports:</div>
+            <div class="text-3xl font-extrabold">5</div>
+          </div>
+          <div
+            class="p-4 rounded-lg shadow-md bg-brand-card text-white text-center"
+          >
+            <div class="text-sm font-light opacity-80">Pending:</div>
+            <div class="text-3xl font-extrabold">3</div>
+          </div>
+          <div
+            class="p-4 rounded-lg shadow-md bg-brand-card text-white text-center"
+          >
+            <div class="text-sm font-light opacity-80">Completed:</div>
+            <div class="text-3xl font-extrabold">1</div>
+          </div>
+          <div
+            class="p-4 rounded-lg shadow-md bg-brand-card text-white text-center"
+          >
+            <div class="text-sm font-light opacity-80">Critical:</div>
+            <div class="text-3xl font-extrabold">1</div>
+          </div>
+        </div>
+
+        <div
+          class="bg-white p-6 rounded-lg shadow-xl border border-gray-100 mb-8"
+        >
+          <h3 class="text-xl font-bold text-center mb-4 text-gray-700">
+            Category Distribution
+          </h3>
+          <div class="max-w-xs mx-auto">
+            <canvas id="categoryDistributionChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="right-panel space-y-8">
+        <div class="bg-white p-6 rounded-lg shadow-xl border border-gray-100">
+          <h3 class="text-xl font-bold text-gray-700 mb-4">
+            Life on Land Sightings Per City
+          </h3>
+          <canvas id="landSightingsChart"></canvas>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-xl border border-gray-100">
+          <h3 class="text-xl font-bold text-gray-700 mb-4">
+            Life on Water Sightings Per City
+          </h3>
+          <canvas id="waterSightingsChart"></canvas>
+        </div>
+      </div>
+    </main>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+      import {
+        getAuth,
+        signInAnonymously,
+        signInWithCustomToken,
+        onAuthStateChanged,
+      } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+      import {
+        getFirestore,
+        collection,
+        addDoc,
+        serverTimestamp,
+        setLogLevel,
+      } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+      const appId =
+        typeof __app_id !== "undefined" ? __app_id : "default-app-id";
+      const firebaseConfig =
+        typeof __firebase_config !== "undefined"
+          ? JSON.parse(__firebase_config)
+          : null;
+      const initialAuthToken =
+        typeof __initial_auth_token !== "undefined"
+          ? __initial_auth_token
+          : null;
+
+      let app, db, auth;
+      let userId = null;
+      let isAuthReady = false;
+
+      const userIdDisplay = document.getElementById("user-id-display");
+
+      if (firebaseConfig) {
+        try {
+          app = initializeApp(firebaseConfig);
+          db = getFirestore(app);
+          auth = getAuth(app);
+          setLogLevel("debug");
+
+          onAuthStateChanged(auth, async (user) => {
+            if (user) {
+              userId = user.uid;
+              isAuthReady = true;
+              userIdDisplay.innerHTML = `<span class="font-bold">User ID:</span> ${userId}`;
+              console.log("Authentication successful. User ID:", userId);
+            } else {
+              userIdDisplay.innerHTML = `<span class="font-bold">Status:</span> Signing in...`;
+              try {
+                if (initialAuthToken) {
+                  await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                  await signInAnonymously(auth);
+                }
+              } catch (error) {
+                console.error("Authentication failed:", error);
+                userIdDisplay.innerHTML = `<span class="font-bold">Error:</span> Auth failed.`;
+                isAuthReady = true;
+              }
+            }
+          });
+        } catch (error) {
+          console.error("Firebase Initialization error:", error);
+          userIdDisplay.innerHTML = `<span class="font-bold">Error:</span> Initialization failed.`;
+          isAuthReady = true;
+        }
+      } else {
+        console.error("Firebase configuration is missing.");
+        userIdDisplay.innerHTML = `<span class="font-bold">Error:</span> Config missing.`;
+        isAuthReady = true;
+      }
+
+      window.goToMainPage = function () {
+        console.log("Navigating to the main page! (Simulated)");
+        const header = document.querySelector("header");
+        // Simulate a visual transition/navigation feedback
+        header.classList.add(
+          "transition",
+          "duration-300",
+          "ease-in-out",
+          "bg-blue-500"
+        );
+        setTimeout(() => {
+          header.classList.remove("bg-blue-500");
+          header.classList.add("bg-brand-header");
+          // In a real application, you would use: window.location.href = 'FP.html';
+        }, 500);
+      };
+
+      const accentColor = "#6dd9e8";
+      const accentColorDark = "#3aa4b0";
+      const labels = ["Item 1", "Item 2", "Item 3", "Item 4"];
+      const pieCtx = document
+        .getElementById("categoryDistributionChart")
+        .getContext("2d");
+      new Chart(pieCtx, {
+        type: "doughnut",
+        data: {
+          labels: ["Item 1: 62.5%", "Item 2: 25%", "Item 3: 12.5%"],
+          datasets: [
+            {
+              data: [5, 2, 1],
+              backgroundColor: [accentColor, accentColorDark, "#99e0e8"],
+              hoverOffset: 16,
+              borderWidth: 2,
+              borderColor: "#ffffff",
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: "bottom",
+              labels: {
+                color: "#374151",
+                font: {
+                  size: 14,
+                },
+              },
+            },
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  let label = context.label || "";
+                  if (label) {
+                    label += ": ";
+                  }
+                  label += context.raw;
+                  return label;
+                },
+              },
+            },
+          },
+        },
+      });
+
+      const landCtx = document
+        .getElementById("landSightingsChart")
+        .getContext("2d");
+      new Chart(landCtx, {
+        type: "bar",
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: "Sightings",
+              data: [10, 15, 25, 30],
+              backgroundColor: accentColor,
+              borderColor: accentColorDark,
+              borderWidth: 1,
+              borderRadius: 6,
+              barPercentage: 0.8,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 30,
+              grid: { color: "rgba(200, 200, 200, 0.2)" },
+            },
+            x: {
+              grid: { display: false },
+            },
+          },
+          plugins: {
+            legend: { display: false },
+            title: { display: false },
+          },
+        },
+      });
+
+      const waterCtx = document
+        .getElementById("waterSightingsChart")
+        .getContext("2d");
+      new Chart(waterCtx, {
+        type: "bar",
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: "Sightings",
+              data: [8, 12, 16, 20],
+              backgroundColor: accentColor,
+              borderColor: accentColorDark,
+              borderWidth: 1,
+              borderRadius: 6,
+              barPercentage: 0.8,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 20,
+              grid: { color: "rgba(200, 200, 200, 0.2)" },
+            },
+            x: {
+              grid: { display: false },
+            },
+          },
+          plugins: {
+            legend: { display: false },
+            title: { display: false },
+          },
+        },
+      });
+    </script>
+  </body>
+</html>
