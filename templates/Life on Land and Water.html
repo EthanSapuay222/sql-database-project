@@ -4,11 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Life on Land & Water</title>
-    <link rel="stylesheet" href="FP.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/FP.css') }}" />
   </head>
   <body>
     <header>
-      <a class="back-button" href="FP.html">
+      <a class="back-button" href="{{ url_for('index') }}">
         <svg
           width="16"
           height="16"
@@ -524,11 +524,6 @@
       <p>Explore more about the Life on Land & Life on Water.</p>
     </footer>
 
-    <script>
-      function goToMainpage() {
-        // Replace with your actual main page URL
-        window.location.href = "index.html";
-      }
-    </script>
+    <script src="{{ url_for('static', filename='js/species.js') }}"></script>
   </body>
 </html>

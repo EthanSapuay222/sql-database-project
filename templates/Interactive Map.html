@@ -5,101 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EcoTrack Map Page</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/FP.css') }}" />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
-    <style>
-      :root {
-        --color-primary-brown: #967969; /* Tan/Brown for Header */
-        --color-secondary-green: #dce5c5; /* Light green/beige for background */
-        --color-critical-red: #dc2626;
-        --color-high-orange: #f59e0b;
-        --color-medium-yellow: #facc15;
-        --color-low-cyan: #22d3ee;
-      }
-      body {
-        font-family: "Inter", sans-serif;
-        background-color: var(--color-secondary-green);
-        min-height: 100vh;
-      }
-      .header-bg {
-        background-color: var(--color-primary-brown);
-      }
-      .severity-filter {
-        background-color: #262626;
-        color: white;
-        border-radius: 9999px;
-        font-weight: 600;
-      }
-      .map-container {
-        position: relative;
-        background-color: #e0f2f1;
-        border-radius: 1.5rem;
-        min-height: 400px;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-          0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        user-select: none;
-      }
-      .map-pin {
-        position: absolute;
-        transform: translate(-50%, -100%);
-        cursor: grab;
-        touch-action: none;
-      }
-      .map-popup {
-        position: absolute;
-        min-width: 250px;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.3s ease;
-        transform: translate(0, -50%);
-      }
-      .map-popup.active {
-        opacity: 1;
-        pointer-events: auto;
-      }
-      .severity-indicator {
-        display: inline-block;
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        margin-right: 8px;
-      }
-      .arrow-path {
-        position: absolute;
-        height: 2px;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-      }
-      .map-popup.active + .arrow-path {
-        opacity: 1;
-      }
-      .arrow-head {
-        position: absolute;
-        right: -5px;
-        top: -4px;
-        width: 0;
-        height: 0;
-        border-top: 5px solid transparent;
-        border-bottom: 5px solid transparent;
-      }
-      .dashboard-view {
-        display: none;
-        padding: 4rem;
-        text-align: center;
-        background-color: white;
-        border-radius: 1rem;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-      }
-    </style>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.icon.glyph/Leaflet.Icon.Glyph.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/map.css') }}" />
   </head>
   <body class="selection:bg-yellow-100 selection:text-gray-900">
     <div id="map-view-app">
       <header class="header-bg p-4 flex justify-between items-center shadow-lg">
         <div class="flex items-center space-x-4">
           <a
-            href="FP.html"
+            href="{{ url_for('index') }}"
             class="bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg text-sm transition duration-150"
           >
             ← Back to MainPage
@@ -123,6 +45,7 @@
             id="severity-filter"
             class="severity-filter appearance-none border border-gray-700 px-4 py-2 text-sm cursor-pointer focus:ring-2 focus:ring-red-500 focus:border-red-500 transition duration-150"
           >
+            <option value="All">All Municipalities</option>
             <option value="Critical">Critical</option>
             <option value="High">High</option>
             <option value="Medium">Medium</option>
@@ -132,72 +55,8 @@
 
         <div
           id="map-container"
-          class="map-container relative overflow-hidden p-8 flex items-center justify-center"
-        >
-          <div id="map-pin" class="map-pin z-10">
-            <svg
-              class="map-marker w-16 h-16 transition duration-300 hover:scale-110"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              aria-hidden="true"
-            >
-              <path
-                d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
-              />
-            </svg>
-          </div>
-
-          <div id="arrow-path" class="arrow-path">
-            <div id="arrow-head" class="arrow-head"></div>
-          </div>
-
-          <div
-            id="info-popup"
-            class="map-popup bg-white p-4 rounded-xl shadow-2xl border border-gray-100 flex flex-col space-y-2"
-          >
-            <div class="flex justify-between items-start">
-              <h3
-                id="popup-city"
-                class="text-lg font-semibold text-gray-800"
-              ></h3>
-              <button
-                id="close-popup"
-                class="text-gray-400 hover:text-gray-700 text-xl leading-none"
-              >
-                &times;
-              </button>
-            </div>
-            <p class="text-sm text-gray-500 border-b pb-1">Batangas Province</p>
-
-            <div class="text-sm space-y-1">
-              <p class="flex justify-between">
-                <span class="text-gray-700">Total Reports:</span>
-                <span id="popup-total" class="font-bold text-gray-900"></span>
-              </p>
-              <p class="flex justify-between items-center">
-                <span class="text-gray-700">Severity Level:</span>
-                <span
-                  id="popup-severity-text-container"
-                  class="flex items-center font-bold"
-                  style="color: var(--color-critical-red)"
-                >
-                  <span id="popup-severity-icon" class="mr-1 text-base"></span>
-                  <span id="popup-severity-text"></span>
-                </span>
-              </p>
-              <p class="text-xs text-gray-500 pt-1">
-                <span id="popup-coords"></span>
-              </p>
-            </div>
-
-            <button
-              id="view-details-btn"
-              class="mt-3 w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center justify-center transition duration-200"
-            >
-              View Details →
-            </button>
-          </div>
-        </div>
+          class="map-container relative overflow-hidden p-0 flex items-center justify-center"
+        ></div>
 
         <div
           class="flex flex-wrap justify-center space-x-6 mt-8 p-4 bg-white rounded-xl shadow-md"
@@ -234,7 +93,10 @@
       </main>
     </div>
 
-    <div id="dashboard-view-app" class="dashboard-view max-w-4xl mx-auto my-12">
+    <div
+      id="dashboard-view-app"
+      class="dashboard-view max-w-4xl mx-auto my-12 hidden"
+    >
       <svg
         class="mx-auto h-16 w-16 text-green-500"
         fill="none"
@@ -252,9 +114,8 @@
       <h2 class="text-3xl font-bold text-gray-800 mt-4">Dashboard Page</h2>
       <p class="text-gray-600 mt-2 mb-6">
         You have successfully navigated to the detailed dashboard for
-        <span id="dashboard-city-name" class="font-bold">Quezon City</span>.
-        This is where comprehensive data visualizations and deeper analysis
-        would appear.
+        <span id="dashboard-city-name" class="font-bold"></span>. This is where
+        comprehensive data visualizations and deeper analysis would appear.
       </p>
       <button
         id="go-back-btn"
@@ -264,220 +125,8 @@
       </button>
     </div>
 
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const mapContainer = document.getElementById("map-container");
-        const mapPin = document.getElementById("map-pin");
-        const infoPopup = document.getElementById("info-popup");
-        const closePopupBtn = document.getElementById("close-popup");
-        const viewDetailsBtn = document.getElementById("view-details-btn");
-        const arrowPath = document.getElementById("arrow-path");
-        const arrowHead = document.getElementById("arrow-head");
-        const goBackBtn = document.getElementById("go-back-btn");
-        const severityFilter = document.getElementById("severity-filter");
-        const dashboardCityName = document.getElementById(
-          "dashboard-city-name"
-        );
-
-        const mapView = document.getElementById("map-view-app");
-        const dashboardView = document.getElementById("dashboard-view-app");
-
-        const SEVERITY_DATA = {
-          Critical: {
-            color: "var(--color-critical-red)",
-            icon: "▲",
-            total: 4,
-            coord: "13.7500, 121.0500",
-            city: "Batangas City",
-          },
-          High: {
-            color: "var(--color-high-orange)",
-            icon: "▲",
-            total: 7,
-            coord: "13.9167, 120.9833",
-            city: "Tanauan City",
-          },
-          Medium: {
-            color: "var(--color-medium-yellow)",
-            icon: "●",
-            total: 15,
-            coord: "13.9667, 120.6167",
-            city: "Nasugbu",
-          },
-          Low: {
-            color: "var(--color-low-cyan)",
-            icon: "●",
-            total: 40,
-            coord: "13.8833, 121.0833",
-            city: "Lipa City",
-          },
-        };
-
-        // ---------------------------------------------------------------------
-        // TODO: MAP LIBRARY INITIALIZATION POINT
-        // 1. Initialize your map library (e.g., Leaflet, Google Maps) here.
-        //    Example: const myMap = L.map('map-container').setView([13.75, 121.05], 10);
-        // 2. Add map tiles (e.g., OpenStreetMap tiles).
-        // 3. Instead of using percentage positioning, you would use the map library's
-        //    functions to place markers using the 'coord' data from SEVERITY_DATA.
-        // ---------------------------------------------------------------------
-
-        const setPinPosition = (xPercent, yPercent) => {
-          const clampedX = Math.min(100, Math.max(0, xPercent));
-          const clampedY = Math.min(100, Math.max(0, yPercent));
-
-          mapPin.style.left = `${clampedX}%`;
-          mapPin.style.top = `${clampedY}%`;
-        };
-
-        const getPinPosition = () => {
-          const left = parseFloat(mapPin.style.left) || 30;
-          const top = parseFloat(mapPin.style.top) || 50;
-          return { left, top };
-        };
-
-        const updatePinVisuals = (severity) => {
-          const data = SEVERITY_DATA[severity];
-
-          mapPin.querySelector(".map-marker").style.color = data.color;
-
-          document.getElementById("popup-city").textContent = data.city;
-          document.getElementById("popup-total").textContent = data.total;
-          document.getElementById("popup-severity-text").textContent = severity;
-          document.getElementById("popup-severity-icon").textContent =
-            data.icon;
-          document.getElementById(
-            "popup-coords"
-          ).textContent = `Coordinates: ${data.coord}`;
-
-          const severitySpanContainer = document.getElementById(
-            "popup-severity-text-container"
-          );
-          severitySpanContainer.style.color = data.color;
-          arrowPath.style.backgroundColor = data.color;
-          arrowHead.style.borderLeftColor = data.color;
-          dashboardCityName.textContent = data.city;
-        };
-
-        const showPopup = () => {
-          const { left, top } = getPinPosition();
-          const popupX = left + 10;
-          const popupY = top - 15;
-
-          infoPopup.style.left = `${popupX}%`;
-          infoPopup.style.top = `${popupY}%`;
-          infoPopup.classList.add("active");
-
-          const arrowW = 8;
-          arrowPath.style.left = `${popupX - arrowW - 1.5}%`;
-          arrowPath.style.top = `${popupY + 1.2}%`;
-          arrowPath.style.width = `${arrowW}%`;
-          arrowPath.classList.add("active");
-        };
-
-        const hidePopup = () => {
-          infoPopup.classList.remove("active");
-          arrowPath.classList.remove("active");
-        };
-
-        let isDragging = false;
-        let currentClientX;
-        let currentClientY;
-
-        const handleDragStart = (e) => {
-          e.preventDefault();
-          isDragging = true;
-          mapPin.style.cursor = "grabbing";
-          hidePopup();
-
-          const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-          const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-          const rect = mapContainer.getBoundingClientRect();
-          const pinLeftPx = (parseFloat(mapPin.style.left) / 100) * rect.width;
-          const pinTopPx = (parseFloat(mapPin.style.top) / 100) * rect.height;
-
-          currentClientX = clientX - pinLeftPx;
-          currentClientY = clientY - pinTopPx;
-        };
-
-        const handleDrag = (e) => {
-          if (!isDragging) return;
-
-          const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-          const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-          const rect = mapContainer.getBoundingClientRect();
-          const newLeftPx = clientX - currentClientX;
-          const newTopPx = clientY - currentClientY;
-          const xPercent = (newLeftPx / rect.width) * 100;
-          const yPercent = (newTopPx / rect.height) * 100;
-
-          setPinPosition(xPercent, yPercent);
-          if (e.touches) {
-            e.preventDefault();
-          }
-        };
-
-        const handleDragEnd = () => {
-          if (!isDragging) return;
-          isDragging = false;
-          mapPin.style.cursor = "grab";
-        };
-
-        mapPin.addEventListener("mousedown", handleDragStart);
-        document.addEventListener("mousemove", handleDrag);
-        document.addEventListener("mouseup", handleDragEnd);
-
-        mapPin.addEventListener("touchstart", handleDragStart, {
-          passive: false,
-        });
-        document.addEventListener("touchmove", handleDrag, { passive: false });
-        document.addEventListener("touchend", handleDragEnd);
-        mapPin.addEventListener("click", (e) => {
-          e.stopPropagation();
-          if (infoPopup.classList.contains("active")) {
-            hidePopup();
-          } else {
-            showPopup();
-          }
-        });
-
-        severityFilter.addEventListener("change", (e) => {
-          updatePinVisuals(e.target.value);
-          hidePopup();
-        });
-
-        closePopupBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          hidePopup();
-        });
-
-        document.addEventListener("click", (e) => {
-          if (!infoPopup.contains(e.target) && e.target !== mapPin) {
-            hidePopup();
-          }
-        });
-
-        viewDetailsBtn.addEventListener("click", () => {
-          mapView.style.display = "none";
-          dashboardView.style.display = "block";
-          hidePopup();
-          window.scrollTo(0, 0);
-        });
-
-        goBackBtn.addEventListener("click", () => {
-          dashboardView.style.display = "none";
-          mapView.style.display = "block";
-          window.scrollTo(0, 0);
-        });
-
-        setPinPosition(30, 50);
-        updatePinVisuals(severityFilter.value);
-
-        mapView.style.display = "block";
-        dashboardView.style.display = "none";
-
-        showPopup();
-      });
-    </script>
+    <script src="{{ url_for('static', filename='js/map.js') }}"></script>
+  </body>
+</html>
   </body>
 </html>

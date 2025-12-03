@@ -7,17 +7,7 @@
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Use Inter font family -->
-    <style>
-      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap");
-      body {
-        font-family: "Inter", sans-serif;
-        background-color: #f3f4f6; /* Light gray background */
-      }
-      /* Custom color approximating the header in the image */
-      .header-bg {
-        background-color: #d9a779;
-      }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/resources-credits.css') }}" />
     <script>
       tailwind.config = {
         theme: {
@@ -38,7 +28,7 @@
       >
         <!-- Back Link -->
         <a
-          href="FP.html"
+          href="{{ url_for('index') }}"
           class="text-gray-800 text-sm hover:underline transition duration-150 ease-in-out font-medium"
         >
           &larr; Back to mainpage

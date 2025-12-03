@@ -33,7 +33,7 @@
         },
       };
     </script>
-    <link rel="stylesheet" href="FP.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/FP.css') }}" />
   </head>
 
   <body class="bg-image-bg">
@@ -46,7 +46,7 @@
             class="bg-image-logo-bg w-10 h-10 rounded-full flex items-center justify-center border-2 border-white"
           >
             <img
-              src="EcotrackLogo.png"
+              src="{{ url_for('static', filename='img/EcotrackLogo.png') }}"
               class="w-full h-full object-cover rounded-full"
               alt="EcoTrack Logo"
             />
@@ -58,7 +58,7 @@
         </div>
 
         <a
-          href="About Button.html"
+          href="{{ url_for('about_view') }}"
           class="text-image-text-dark hover:text-gray-800 text-base font-semibold"
         >
           About Us
@@ -73,7 +73,7 @@
           <ul class="space-y-2">
             <li>
               <a
-                href="Life on Land and Water.html"
+                href="{{ url_for('species_view') }}"
                 class="bg-button-main-bg text-image-text-light p-3 flex items-center rounded-lg hover:bg-button-main-hover transition duration-150 font-medium shadow-md"
               >
                 <span class="text-xl mr-2">→</span> View Life on Land & Water
@@ -81,7 +81,7 @@
             </li>
             <li>
               <a
-                href="Environmental Dashboard.html"
+                href="{{ url_for('dashboard_view') }}"
                 class="bg-button-main-bg text-image-text-light p-3 flex items-center rounded-lg hover:bg-button-main-hover transition duration-150 font-medium shadow-md"
               >
                 <span class="text-xl mr-2">→</span> Environmental Dashboard
@@ -89,7 +89,7 @@
             </li>
             <li>
               <a
-                href="Submission Report.html"
+                href="{{ url_for('submission_report_view') }}"
                 class="bg-button-main-bg text-image-text-light p-3 flex items-center rounded-lg hover:bg-button-main-hover transition duration-150 font-medium shadow-md"
               >
                 <span class="text-xl mr-2">→</span> Submission Report
@@ -97,7 +97,7 @@
             </li>
             <li>
               <a
-                href="Interactive Map.html"
+                href="{{ url_for('map_view') }}"
                 class="bg-button-main-bg text-image-text-light p-3 flex items-center rounded-lg hover:bg-button-main-hover transition duration-150 font-medium shadow-md"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -188,7 +188,7 @@
           <div class="flex items-center space-x-2">
             <div class="bg-teal-400 rounded-full p-1">
               <img
-                src="EcotrackLogo.png"
+                src="{{ url_for('static', filename='img/EcotrackLogo.png') }}"
                 alt="EcoTrack"
                 class="w-8 h-8 rounded-full object-cover"
               />
@@ -209,7 +209,7 @@
           </div>
 
           <a
-            href="Resources and Credits.html"
+            href="{{ url_for('resources_view') }}"
             class="text-white italic hover:underline flex items-center font-semibold mt-4"
           >
             Resources & Credits

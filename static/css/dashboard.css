@@ -1,0 +1,19 @@
+/* Environmental Dashboard Styles */
+
+.main-dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  padding: 2rem;
+  background: linear-gradient(
+    to right,
+    var(--brand-background-left, #ffffff) 50%,
+    var(--brand-background-right, #f3f4e1) 50%
+  );
+}
+
+@media (min-width: 1024px) {
+  .main-dashboard-grid {
+    grid-template-columns: 1fr 1fr; /* 50% split */
+  }
+}

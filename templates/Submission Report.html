@@ -3,341 +3,177 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EcoTrack - Resources and Credits</title>
-    <!-- Load Tailwind CSS -->
+    <title>EcoTrack Submission Page</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Use Inter font family -->
-    <style>
-      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap");
-      body {
-        font-family: "Inter", sans-serif;
-        background-color: #f3f4f6; /* Light gray background */
-      }
-      /* Custom color approximating the header in the image */
-      .header-bg {
-        background-color: #d9a779;
-      }
-    </style>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              "custom-tan": "#D9A779",
-            },
-          },
-        },
-      };
-    </script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/FP.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/submission-report.css') }}" />
   </head>
-  <body class="min-h-screen flex flex-col">
-    <!-- Top Navigation/Header Banner -->
-    <header class="header-bg shadow-lg p-4">
+  <body class="min-h-screen flex flex-col items-center">
+    <header
+      class="w-full bg-[#fcf8e8] shadow-md border-b-2 border-b-[#f0e7d0] relative"
+    >
       <div
-        class="max-w-7xl mx-auto flex justify-between items-center px-4 sm:px-6 lg:px-8"
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between"
       >
-        <!-- Back Link -->
         <a
-          href="FP.html"
-          class="text-gray-800 text-sm hover:underline transition duration-150 ease-in-out font-medium"
+          href="{{ url_for('index') }}"
+          class="absolute left-4 top-1/2 transform -translate-y-1/2 text-sm text-[#F2DB8F] hover:underline"
         >
-          &larr; Back to mainpage
+          <- Back to Main Page
         </a>
 
-        <!-- Logo / App Title -->
-        <div class="flex items-center space-x-2">
-          <!-- Simple stylized 'E' logo/icon using Tailwind colors -->
+        <div class="flex items-center text-[#4b553c] font-extrabold text-xl">
           <svg
-            class="w-6 h-6 text-teal-500"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6 mr-2"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
           >
             <path
-              fill-rule="evenodd"
-              d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-8a1 1 0 00-1 1v3a1 1 0 102 0v-3a1 1 0 00-1-1zM9 7a1 1 0 011-1h1a1 1 0 110 2h-1a1 1 0 01-1-1z"
-              clip-rule="evenodd"
-            ></path>
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0h6m-6 0h-2a1 1 0 00-1 1v-5a1 1 0 011-1h2z"
+            />
           </svg>
-          <span class="text-xl font-bold text-gray-800">EcoTrack</span>
+          EcoTrack
         </div>
-
-        <!-- Placeholder for alignment -->
-        <div class="w-36"></div>
+        <h2
+          class="text-2xl font-extrabold text-[#b44141] uppercase tracking-wider"
+        >
+          Report Submission
+        </h2>
       </div>
     </header>
 
-    <!-- Main Content Area -->
-    <main class="flex-grow flex justify-center items-start pt-12 p-4">
-      <!-- Resources and Credits Card -->
-      <div
-        class="w-full max-w-4xl bg-white p-8 md:p-12 rounded-xl shadow-2xl border border-gray-100"
+    <div
+      id="submission-card"
+      class="bg-[#fcf8e8] p-6 sm:p-8 rounded-xl shadow-xl w-full max-w-2xl mt-8 mb-8"
+    >
+      <h1
+        class="text-2xl font-extrabold text-[#4b553c] mb-6 border-b pb-2 text-center"
       >
-        <h1
-          class="text-3xl md:text-4xl font-extrabold text-gray-800 mb-8 text-center tracking-tight"
-        >
-          Resources and Credits
-        </h1>
+        Submit Environmental Report
+      </h1>
 
-        <!-- Content Container (Images and References) -->
-        <div class="space-y-10">
-          <!-- Images Section -->
-          <section>
-            <h2 class="text-2xl font-bold text-gray-700 mb-4 border-b pb-2">
-              Images
-            </h2>
-            <ul
-              class="list-disc list-outside ml-6 space-y-3 text-lg text-gray-600"
-            >
-              <li class="pl-2">
-                <span class="font-semibold text-gray-800">EcotrackLogo</span> -
-                <a
-                  href="https://ecotrackk.netlify.app/_f61d024c-65e4-454d-9871-2e6f4dea8bc0%20(1).png"
-                  class="text-blue-600 hover:text-blue-800 transition duration-150 ease-in-out break-all"
-                  target="_blank"
-                  >https://ecotrackk.netlify.app/_f61d024c-65e4-454d-9871-2e6f4dea8bc0%20(1)/</a
-                >
-              </li>
-               <li class="pl-2">
-                <span class="font-semibold text-gray-800"
-                  >Whale Shark</span
-                >
-                -
-                <a
-                  href="https://share.google/images/WNnIpLBlPEAsCMJte"
-                  class="text-blue-600 hover:text-blue-800 transition duration-150 ease-in-out break-all"
-                  target="_blank"
-                  >https://share.google/images/WNnIpLBlPEAsCMJte</a
-                >
-              </li>
-               <li class="pl-2">
-                <span class="font-semibold text-gray-800"
-                  >Spinner Dolphin</span
-                >
-                -
-                <a
-                  href="https://share.google/images/8U2YfV1L0XpNaSH75"
-                  class="text-blue-600 hover:text-blue-800 transition duration-150 ease-in-out break-all"
-                  target="_blank"
-                  >https://share.google/images/8U2YfV1L0XpNaSH75</a
-                >
-              </li>
-              <li class="pl-2">
-                <span class="font-semibold text-gray-800"
-                  >Philippine Warty Pig</span
-                >
-                -
-                <a
-                  href="https://share.google/images/ohB58t4eGDqc18u68"
-                  class="text-blue-600 hover:text-blue-800 transition duration-150 ease-in-out break-all"
-                  target="_blank"
-                  >https://share.google/images/ohB58t4eGDqc18u68</a
-                >
-              </li>
-              <li class="pl-2">
-                <span class="font-semibold text-gray-800"
-                  >Philippine Long-Tailed Macaque</span
-                >
-                -
-                <a
-                  href="https://share.google/images/ro6GKR9jjt5gW0I8K"
-                  class="text-blue-600 hover:text-blue-800 transition duration-150 ease-in-out break-all"
-                  target="_blank"
-                  >https://share.google/images/ro6GKR9jjt5gW0I8K</a
-                >
-              </li>
-              <li class="pl-2">
-                <span class="font-semibold text-gray-800"
-                  >Olive Ridley Turtle</span
-                >
-                -
-                <a
-                  href="https://share.google/images/cJ8sYkgklCeVqGhRN"
-                  class="text-blue-600 hover:text-blue-800 transition duration-150 ease-in-out break-all"
-                  target="_blank"
-                  >https://share.google/images/cJ8sYkgklCeVqGhRN</a
-                >
-              </li>
-              <li class="pl-2">
-                <span class="font-semibold text-gray-800"
-                  >Manta Rays</span
-                >
-                -
-                <a
-                  href="https://share.google/images/cJ8sYkgklCeVqGhRN"
-                  class="text-blue-600 hover:text-blue-800 transition duration-150 ease-in-out break-all"
-                  target="_blank"
-                  >https://share.google/images/cJ8sYkgklCeVqGhRN</a
-                >
-              </li>
-              <li class="pl-2">
-                <span class="font-semibold text-gray-800"
-                  >Hawksbill Turtle</span
-                >
-                -
-                <a
-                  href="https://share.google/images/LFuo160x7jK5LdEty"
-                  class="text-blue-600 hover:text-blue-800 transition duration-150 ease-in-out break-all"
-                  target="_blank"
-                  >https://share.google/images/LFuo160x7jK5LdEty</a
-                >
-              </li>
-              <li class="pl-2">
-                <span class="font-semibold text-gray-800"
-                  >Green Turtle</span
-                >
-                -
-                <a
-                  href="https://share.google/images/Q4M8DySXfeGIX9zja"
-                  class="text-blue-600 hover:text-blue-800 transition duration-150 ease-in-out break-all"
-                  target="_blank"
-                  >https://share.google/images/Q4M8DySXfeGIX9zja</a
-                >
-              </li>
-              <li class="pl-2">
-                <span class="font-semibold text-gray-800"
-                  >Dwarf Sperm Whale</span
-                >
-                -
-                <a
-                  href="https://share.google/images/gTubDxkeDvSrfbtho"
-                  class="text-blue-600 hover:text-blue-800 transition duration-150 ease-in-out break-all"
-                  target="_blank"
-                  >https://share.google/images/gTubDxkeDvSrfbtho</a
-                >
-              </li>
-               <li class="pl-2">
-                <span class="font-semibold text-gray-800"
-                  >Collared Kingfisher</span
-                >
-                -
-                <a
-                  href="https://share.google/images/71gqZyBeaaEKPx3ta"
-                  class="text-blue-600 hover:text-blue-800 transition duration-150 ease-in-out break-all"
-                  target="_blank"
-                  >https://share.google/images/71gqZyBeaaEKPx3ta</a
-                >
-              </li>
-               <li class="pl-2">
-                <span class="font-semibold text-gray-800"
-                  >Blacktip Reef Shark</span
-                >
-                -
-                <a
-                  href="https://share.google/images/tVZdRWsHQ1rf0zLXD 
-
-"
-                  class="text-blue-600 hover:text-blue-800 transition duration-150 ease-in-out break-all"
-                  target="_blank"
-                  >https://share.google/images/tVZdRWsHQ1rf0zLXD 
-                  </li>
-                </a
-                >
-              </li>
-            </ul>
-          </section>
-
-          <!-- References Section -->
-          <section>
-            <h2 class="text-2xl font-bold text-gray-700 mb-4 border-b pb-2">
-              References
-            </h2>
-            <ul
-              class="list-disc list-outside ml-6 space-y-3 text-lg text-gray-600"
-            >
-              </li>
-              <li class="pl-2">
-                <span class="font-semibold text-gray-800">Philippine Duck:</span>
-             <a
-                  href=" Philippine Duck Anas Luzonica Species Factsheet | BirdLife DataZone
-Philippine Duck: A Deep Dive into This Unique Waterfowl Species - The Worlds Rarest Birds"
-                  class="text-blue-600 hover:text-blue-800 transition duration-150 ease-in-out break-all"
-                  target="_blank"
-                  > Philippine Duck Anas Luzonica Species Factsheet | BirdLife DataZone
-Philippine Duck: A Deep Dive into This Unique Waterfowl Species - The Worlds Rarest Birds</a
-                >   
-              </li>
-              <li class="pl-2">
-                <span class="font-semibold text-gray-800">White-Breasted Waterhen:</span>
-                  <a
-                  href=" White-Breasted Waterhen - Facts, Diet, Habitat & Pictures on Animalia.bio"
-                  class="text-blue-600 hover:text-blue-800 transition duration-150 ease-in-out break-all"
-                  target="_blank"
-                  > White-Breasted Waterhen - Facts, Diet, Habitat & Pictures on Animalia.bio</a
-                >
-
-              </li>
-              <li class="pl-2">
-                <span class="font-semibold text-gray-800">Garden Sunbird:</span>
-                <a
-                  href=" Garden Sunbird - Facts, Diet, Habitat & Pictures on Animalia.bio
-Garden Sunbird - eBird"
-                  class="text-blue-600 hover:text-blue-800 transition duration-150 ease-in-out break-all"
-                  target="_blank"
-                  > Garden Sunbird - Facts, Diet, Habitat & Pictures on Animalia.bio
-Garden Sunbird - eBird</a
-                >
-              </li>
-              <li class="pl-2">
-                <span class="font-semibold text-gray-800">Greater musky fruit bat:</span>
-               <a
-                  href="Greater Musky Fruit Bat (Ptenochirus jagorii) - Know Your Mammals
-Greater musky fruit bat - Facts, Diet, Habitat & Pictures on Animalia.bio"
-                  class="text-blue-600 hover:text-blue-800 transition duration-150 ease-in-out break-all"
-                  target="_blank"
-                  >Greater Musky Fruit Bat (Ptenochirus jagorii) - Know Your Mammals
-Greater musky fruit bat - Facts, Diet, Habitat & Pictures on Animalia.bio</a
-                >
-              </li>
-               <li class="pl-2">
-                <span class="font-semibold text-gray-800">Luzon Giant cloud rat:</span>
-                  <a
-                  href="Northern Luzon Giant Cloud Rat - Facts, Diet, Habitat & Pictures on Animalia.bio"
-                  class="text-blue-600 hover:text-blue-800 transition duration-150 ease-in-out break-all"
-                  target="_blank"
-                  >Northern Luzon Giant Cloud Rat - Facts, Diet, Habitat & Pictures on Animalia.bio</a
-                >
-              </li>
-               <li class="pl-2">
-                <span class="font-semibold text-gray-800">Lion:</span>
-                 <a
-                  href="Lion - Facts, Diet, Habitat & Pictures on Animalia.bio"
-                  class="text-blue-600 hover:text-blue-800 transition duration-150 ease-in-out break-all"
-                  target="_blank"
-                  >Lion - Facts, Diet, Habitat & Pictures on Animalia.bio</a
-                >
-              </li>
-               <li class="pl-2">
-                <span class="font-semibold text-gray-800">Tokay Gecko:</span>
-                <a
-                  href="Tokay Gecko - Facts, Diet, Habitat & Pictures on Animalia.bio"
-                  class="text-blue-600 hover:text-blue-800 transition duration-150 ease-in-out break-all"
-                  target="_blank"
-                  >Tokay Gecko - Facts, Diet, Habitat & Pictures on Animalia.bio</a
-                > 
-              </li>
-               <li class="pl-2">
-                <span class="font-semibold text-gray-800">Reticulated Python:</span>
-                <a
-                  href="Reticulated Python - Facts, Diet, Habitat & Pictures on Animalia.bio"
-                  class="text-blue-600 hover:text-blue-800 transition duration-150 ease-in-out break-all"
-                  target="_blank"
-                  >Reticulated Python - Facts, Diet, Habitat & Pictures on Animalia.bio</a
-                >
-              </li>
-               <li class="pl-2">
-                <span class="font-semibold text-gray-800">Common house gecko:</span>
-                 <a
-                  href="Common House Gecko - Facts, Diet, Habitat & Pictures on Animalia.bio"
-                  class="text-blue-600 hover:text-blue-800 transition duration-150 ease-in-out break-all"
-                  target="_blank"
-                  >Common House Gecko - Facts, Diet, Habitat & Pictures on Animalia.bio</a
-                >s
-              </li>
-            </ul>
-          </section>
+      <form id="report-form" class="space-y-6">
+        <div>
+          <label
+            for="report-title"
+            class="block text-sm font-medium text-[#4b553c] mb-1"
+          >
+            Report Title
+            <span class="pill-label">Title by user</span>
+          </label>
+          <input
+            type="text"
+            id="report-title"
+            name="report-title"
+            placeholder="A concise title for your report"
+            required
+            class="form-field"
+          />
         </div>
+
+        <div>
+          <label
+            for="description"
+            class="block text-sm font-medium text-[#4b553c] mb-1"
+          >
+            Description
+            <span class="pill-label">description given by user</span>
+          </label>
+          <textarea
+            id="description"
+            name="description"
+            rows="4"
+            placeholder="Detailed observation of the incident or environmental issue"
+            required
+            class="form-field"
+          ></textarea>
+        </div>
+
+        <div>
+          <label
+            for="category"
+            class="block text-sm font-medium text-[#4b553c] mb-1"
+          >
+            Category
+            <span class="pill-label">(Severity Filter)</span>
+          </label>
+          <select id="category" name="category" required class="form-field">
+            <option value="">Select Environmental Category</option>
+            <option value="pollution">Pollution</option>
+            <option value="deforestation">Deforestation</option>
+            <option value="waste">Waste Dumping</option>
+            <option value="wildlife">Wildlife Incident</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div>
+          <label
+            for="location"
+            class="block text-sm font-medium text-[#4b553c] mb-1"
+          >
+            Location
+            <span class="pill-label">(Location)</span>
+          </label>
+          <input
+            type="text"
+            id="location"
+            name="location"
+            placeholder="Address, coordinates, or description of location"
+            required
+            class="form-field"
+          />
+        </div>
+
+        <div>
+          <label
+            for="severity"
+            class="block text-sm font-medium text-[#4b553c] mb-1"
+          >
+            Severity
+            <span class="pill-label">(Severity Filter)</span>
+          </label>
+          <select id="severity" name="severity" required class="form-field">
+            <option value="">Select Impact Severity</option>
+            <option value="low">Low Impact</option>
+            <option value="medium">Medium Impact</option>
+            <option value="high">High Impact</option>
+            <option value="critical">Critical</option>
+          </select>
+        </div>
+
+        <button
+          type="submit"
+          class="w-full py-3 bg-[#6d8e48] hover:bg-[#85a850] text-white font-bold rounded-lg shadow-lg transition duration-200 mt-6 text-lg"
+        >
+          Submit Report
+        </button>
+      </form>
+
+      <div
+        id="message-box"
+        class="mt-4 p-3 text-center rounded-lg hidden"
+        role="alert"
+      ></div>
+
+      <div
+        class="mt-8 pt-4 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center text-sm"
+      >
+        <p id="user-id-display" class="text-xs text-gray-500 mb-2 sm:mb-0">
+          <span class="font-bold">Status:</span> Initializing...
+        </p>
       </div>
-    </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/FP.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/submission-report.js') }}"></script>
   </body>
 </html>
