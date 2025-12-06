@@ -164,7 +164,7 @@ class EnvironmentalReport(db.Model):
     
     report_id = db.Column(db.Integer, primary_key=True)
     location_id = db.Column(db.Integer, db.ForeignKey('locations.location_id'), nullable=False)
-    report_type = db.Column(db.Enum('pollution', 'habitat_loss', 'illegal_activity', 'wildlife_incident', 'other'), nullable=False)
+    report_type = db.Column(db.Enum('pollution', 'deforestation', 'waste_dumping', 'wildlife_incident', 'other'), nullable=False)
     severity = db.Column(db.Enum('Critical', 'High', 'Medium', 'Low'), nullable=False)
     status = db.Column(db.Enum('pending', 'in_progress', 'completed', 'closed'), default='pending')
     title = db.Column(db.String(200), nullable=False)

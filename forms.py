@@ -17,8 +17,8 @@ class EnvironmentalReportForm(FlaskForm):
     report_type = SelectField('Report Type', 
         choices=[
             ('pollution', 'Pollution'),
-            ('habitat_loss', 'Habitat Loss'),
-            ('illegal_activity', 'Illegal Activity'),
+            ('deforestation', 'Deforestation'),
+            ('waste_dumping', 'Waste Dumping'),
             ('wildlife_incident', 'Wildlife Incident'),
             ('other', 'Other')
         ],

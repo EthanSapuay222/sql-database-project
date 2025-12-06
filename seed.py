@@ -1,27 +1,3 @@
-#!/usr/bin/env python
-"""
-Master Seed Script - Populates all reference data into the database
-=================================================================
-
-This script seeds the following tables:
-  1. Locations (34 Batangas cities & municipalities)
-  2. Report Categories (5 categories: Pollution, Deforestation, Waste Dumping, Wildlife Incident, Other)
-  3. Report Severity Levels (4 levels: Low, Medium, High, Critical)
-  4. Species (20 species: 12 land, 8 water)
-  5. Sample Environmental Reports (10 test reports)
-
-Usage: python seed.py
-
-Tracking:
-- v1.0 (Dec 6, 2025): Initial combined seed with locations, categories, severity
-- v2.0 (Dec 6, 2025): Added species and sample reports seeding
-- Added locations: 34 Batangas locations with lat/long and severity levels
-- Added categories: 5 environmental report types
-- Added severity: 4-level severity scale
-- Added species: 20 species (land and water animals)
-- Added sample reports: 10 environmental reports for testing
-"""
-
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -31,7 +7,6 @@ from model import Location, ReportCategory, ReportSeverity, Species, Environment
 from database import db
 from datetime import date, timedelta
 import random
-
 
 # ============================================================================
 # SECTION 1: LOCATIONS DATA
@@ -85,6 +60,17 @@ SAMPLE_LOCATIONS = [
 # ============================================================================
 # 5 categories for environmental reports
 # Used in submission form dropdown and dashboard filtering
+#
+# ⚠️ IMPORTANT: Category names are converted to enum values in the database!
+# Conversion: name.lower().replace(' ', '_')
+# Example: "Waste Dumping" → "waste_dumping"
+#
+# If you change these categories, you MUST also update:
+# 1. model.py → EnvironmentalReport.report_type Enum values
+# 2. forms.py → EnvironmentalReportForm.report_type choices
+# 3. All SAMPLE_REPORTS below that reference these categories
+#
+# Current enum values: pollution, deforestation, waste_dumping, wildlife_incident, other
 
 SAMPLE_CATEGORIES = [
     {'name': 'Pollution', 'description': 'Air, water, soil, or noise pollution'},
@@ -100,6 +86,15 @@ SAMPLE_CATEGORIES = [
 # ============================================================================
 # 4 severity levels for environmental reports
 # Used in submission form dropdown and dashboard stats
+#
+# ⚠️ IMPORTANT: Severity levels are case-sensitive in the database!
+# Enum values: Critical, High, Medium, Low (capitalized)
+#
+# If you change these levels, you MUST also update:
+# 1. model.py → EnvironmentalReport.severity Enum values
+# 2. model.py → Location.severity_level Enum values
+# 3. forms.py → EnvironmentalReportForm.severity choices
+# 4. All SAMPLE_REPORTS and SAMPLE_LOCATIONS that reference severity
 
 SAMPLE_SEVERITY = [
     {'level': 'Low', 'description': 'Minor environmental impact, non-urgent'},
@@ -352,7 +347,7 @@ SAMPLE_REPORTS = [
     {
         'title': 'Deforestation in Taal Watershed',
         'description': 'Unauthorized tree cutting observed in the protected watershed area.',
-        'report_type': 'habitat_loss',
+        'report_type': 'deforestation',
         'severity': 'High',
         'reporter_name': 'Maria Santos',
         'reporter_contact': 'maria@email.com',
@@ -388,7 +383,7 @@ SAMPLE_REPORTS = [
     {
         'title': 'Illegal Fishing Activity',
         'description': 'Use of dynamite fishing reported in coastal areas of Mabini.',
-        'report_type': 'illegal_activity',
+        'report_type': 'waste_dumping',
         'severity': 'Critical',
         'reporter_name': 'Rosa Mendoza',
         'reporter_contact': 'rosa.m@email.com',
@@ -406,7 +401,7 @@ SAMPLE_REPORTS = [
     {
         'title': 'Coral Reef Damage',
         'description': 'Boat anchors damaging coral formations in Tingloy marine sanctuary.',
-        'report_type': 'habitat_loss',
+        'report_type': 'deforestation',
         'severity': 'High',
         'reporter_name': 'Lisa Fernandez',
         'reporter_contact': '09162345678',
@@ -424,7 +419,7 @@ SAMPLE_REPORTS = [
     {
         'title': 'Mangrove Clearing in Balayan',
         'description': 'Illegal clearing of mangrove forest for construction purposes.',
-        'report_type': 'habitat_loss',
+        'report_type': 'deforestation',
         'severity': 'Critical',
         'reporter_name': 'Elena Torres',
         'reporter_contact': 'elena.t@email.com',
@@ -626,9 +621,17 @@ def main():
         print("=" * 70)
         print("🌱 MASTER SEED - EcoTrack Database Initialization")
         print("=" * 70)
+        print()
+        
+        # Validate enum consistency before seeding
+        if not validate_enum_consistency():
+            print("\n❌ Seeding aborted due to validation errors.\n")
+            return
+        
+        print()
 
         # Seed Locations
-        print("\n[1/5] Seeding Locations (34 Batangas cities & municipalities)...")
+        print("[1/5] Seeding Locations (34 Batangas cities & municipalities)...")
         loc_inserted, loc_updated = seed_locations()
         print(f"      ✅ Locations - Inserted: {loc_inserted}, Updated: {loc_updated}")
 
