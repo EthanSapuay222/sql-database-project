@@ -116,21 +116,17 @@
         </div>
 
         <div>
-          <label
+        <label
             for="location"
             class="block text-sm font-medium text-[#4b553c] mb-1"
           >
             Location
             <span class="pill-label">(Location)</span>
-          </label>
-          <input
-            type="text"
-            id="location"
-            name="location"
-            placeholder="Address, coordinates, or description of location"
-            required
-            class="form-field"
-          />
+        </label>
+        <select id="location" name="location" required class="form-field">
+            <option value="">Select Location</option>
+            <!-- Options will be populated dynamically from the database -->
+        </select>
         </div>
 
         <div>
