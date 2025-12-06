@@ -1,10 +1,124 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EcoTrack Home</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+{% extends 'base.html' %}
+
+{% block title %}EcoTrack Home{% endblock %}
+
+{% block head %}
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          "image-bg": "#FFFBF0",
+          "image-header-bg": "#A0B0A0",
+          "image-sidebar-bg": "#A0B0A0",
+          "footer-brown": "#B86E28",
+          "button-main-bg": "#6B8E23",
+          "button-main-hover": "#556B2F",
+          "image-text-light": "#FFFFFF",
+          "image-text-dark": "#36454F",
+          "image-link-text": "#FFFFFF",
+          "image-logo-bg": "#6B8E23",
+          "map-border": "#6B8E23",
+        },
+      },
+    },
+  };
+</script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/FP.css') }}" />
+{% endblock %}
+
+{% block content %}
+<div id="app-container" class="min-h-screen flex flex-col">
+  <header class="bg-image-header-bg p-4 flex justify-between items-center shadow-lg">
+    <div class="flex items-center space-x-3">
+      <div class="bg-image-logo-bg w-10 h-10 rounded-full flex items-center justify-center border-2 border-white">
+        <img src="{{ url_for('static', filename='img/EcotrackLogo.png') }}" class="w-full h-full object-cover rounded-full" alt="EcoTrack Logo" />
+      </div>
+      <span class="text-image-text-dark font-extrabold text-2xl tracking-wider">EcoTrack</span>
+    </div>
+    <a href="{{ url_for('about_view') }}" class="text-image-text-dark hover:text-gray-800 text-base font-semibold">About Us</a>
+  </header>
+
+  <div class="flex flex-1">
+    <nav id="sidebar-nav" class="w-64 bg-image-sidebar-bg p-4 flex flex-col space-y-2 shadow-xl hidden md:flex">
+      <ul class="space-y-2">
+        <li>
+          <a href="{{ url_for('species_view') }}" class="bg-button-main-bg text-image-text-light p-3 flex items-center rounded-lg hover:bg-button-main-hover transition duration-150 font-medium shadow-md">
+            <span class="text-xl mr-2">→</span> View Life on Land & Water
+          </a>
+        </li>
+        <li>
+          <a href="{{ url_for('dashboard_view') }}" class="bg-button-main-bg text-image-text-light p-3 flex items-center rounded-lg hover:bg-button-main-hover transition duration-150 font-medium shadow-md">
+            <span class="text-xl mr-2">→</span> Environmental Dashboard
+          </a>
+        </li>
+        <li>
+          <a href="{{ url_for('submission_report_view') }}" class="bg-button-main-bg text-image-text-light p-3 flex items-center rounded-lg hover:bg-button-main-hover transition duration-150 font-medium shadow-md">
+            <span class="text-xl mr-2">→</span> Submission Report
+          </a>
+        </li>
+        <li>
+          <a href="{{ url_for('map_view') }}" class="bg-button-main-bg text-image-text-light p-3 flex items-center rounded-lg hover:bg-button-main-hover transition duration-150 font-medium shadow-md" target="_blank" rel="noopener noreferrer">
+            <span class="text-xl mr-2">→</span> Interactive Map
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <main id="main-content" class="flex-1 p-8">
+      <div class="text-center">
+        <h2 class="text-2xl font-semibold italic text-image-text-dark mb-2">"Track Change, Make Impact"</h2>
+        <p class="text-lg text-image-text-dark font-medium mb-16">Environmental Awareness & Progress Tracker for Batangas</p>
+      </div>
+      <div class="bg-green-700 p-8 rounded-lg shadow-lg mb-8 text-white max-w-4xl mx-auto">
+        <h3 class="text-2xl font-semibold mb-4">SDG 14: Life Below Water</h3>
+        <p class="text-lg leading-relaxed">Healthy oceans and seas are essential to our existence. They cover 70 percent of our planet and we rely on them for food, energy and water. Yet, we have managed to do tremendous damage to these precious resources. We must protect them by eliminating pollution and overfishing and immediately start to responsibly manage and protect all marine life around the world.</p>
+      </div>
+
+      <div class="bg-green-700 p-8 rounded-lg shadow-lg text-white max-w-4xl mx-auto">
+        <h3 class="text-2xl font-semibold mb-4">SDG 15: Life On Land</h3>
+        <p class="text-lg leading-relaxed">A flourishing life on land is the foundation for our life on this planet. We are all part of the planet's ecosystem and we have caused severe damage to it through deforestation, loss of natural habitats and land degradation. Promoting a sustainable use of our ecosystems and preserving biodiversity is not a cause. It is the key to our own survival.</p>
+      </div>
+    </main>
+  </div>
+
+  <section class="p-8 border-t border-map-border bg-image-bg">
+    <div class="container mx-auto flex flex-col items-center">
+      <h3 class="text-2xl font-bold mb-4 text-image-sidebar-bg">Environmental Reports Across Batangas (Map Preview)</h3>
+      <div class="w-full max-w-4xl h-96 border-4 border-map-border rounded-xl overflow-hidden shadow-lg">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15478.432658428352!2d120.98547372161476!3d13.754876793740905!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33bd0d3a51052219%3A0x629c41793b827376!2sBatangas%2C%20Philippines!5e0!3m2!1sen!2sus!4v1700940000000!5m2!1sen!2sus" width="100%" height="100%" style="border: 0" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+      <a href="https://www.google.com/maps/place/Batangas/@13.8830122,120.9792228,10z/data=!3m1!4b1!4m6!3m5!1s0x33bd128233299b11:0xa1a919d8b4e7fda3!8m2!3d13.9450336!4d121.1312012!16zL20vMDFqZDA1?entry=ttu&g_ep=EgoyMDI1MTExNy4wIKXMDSoASAFQAw%3D%3D" class="mt-6 inline-block">
+        <button type="button" class="bg-button-main-bg text-white px-8 py-3 rounded-full text-lg font-semibold shadow-md hover:bg-button-main-hover transition duration-150">View Full Map</button>
+      </a>
+    </div>
+  </section>
+
+  <footer class="bg-footer-brown text-white py-10 w-full">
+    <div class="container mx-auto flex flex-col items-center text-center space-y-4">
+      <div class="flex items-center space-x-2">
+        <div class="bg-teal-400 rounded-full p-1">
+          <img src="{{ url_for('static', filename='img/EcotrackLogo.png') }}" alt="EcoTrack" class="w-8 h-8 rounded-full object-cover" />
+        </div>
+        <span class="text-2xl font-bold">EcoTrack</span>
+      </div>
+      <h2 class="text-xl font-bold italic">"Track Change, Make Impact"</h2>
+      <div class="text-sm space-y-1">
+        <p>&copy; 2025 Group 5 – DBMS & Advance Computer Programing School Project</p>
+        <p class="font-bold">Created by: Sapuay | Semira | Caguimbal | De Chavez</p>
+      </div>
+      <a href="{{ url_for('resources_view') }}" class="text-white italic hover:underline flex items-center font-semibold mt-4">
+        Resources & Credits
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" class="w-5 h-5 ml-2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+        </svg>
+      </a>
+    </div>
+  </footer>
+</div>
+{% endblock %}
+
+{% block scripts %}{% endblock %}
     <script>
       tailwind.config = {
         theme: {

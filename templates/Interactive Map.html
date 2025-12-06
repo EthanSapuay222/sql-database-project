@@ -1,22 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EcoTrack Map Page</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/FP.css') }}" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
-      rel="stylesheet"
-    />
+{% extends 'base.html' %}
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet.icon.glyph/Leaflet.Icon.Glyph.js"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/map.css') }}" />
-  </head>
-  <body class="selection:bg-yellow-100 selection:text-gray-900">
+{% block title %}EcoTrack Map Page{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/FP.css') }}" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.icon.glyph/Leaflet.Icon.Glyph.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/map.css') }}" />
+{% endblock %}
+
+{% block content %}
+<body class="selection:bg-yellow-100 selection:text-gray-900">
     <div id="map-view-app">
       <header class="header-bg p-4 flex justify-between items-center shadow-lg">
         <div class="flex items-center space-x-4">
@@ -126,7 +122,4 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/map.js') }}"></script>
-  </body>
-</html>
-  </body>
-</html>
+{% endblock %}

@@ -1,12 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Life on Land & Water</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/FP.css') }}" />
-  </head>
-  <body>
+{% extends 'base.html' %}
+
+{% block title %}Life on Land & Water{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/FP.css') }}" />
+{% endblock %}
+
+{% block content %}
+<body>
     <header>
       <a class="back-button" href="{{ url_for('index') }}">
         <svg
@@ -525,5 +526,4 @@
     </footer>
 
     <script src="{{ url_for('static', filename='js/species.js') }}"></script>
-  </body>
-</html>
+{% endblock %}

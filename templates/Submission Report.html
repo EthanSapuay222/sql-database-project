@@ -1,18 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EcoTrack Submission Page</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/FP.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/submission-report.css') }}" />
-  </head>
-  <body class="min-h-screen flex flex-col items-center">
+{% extends 'base.html' %}
+
+{% block title %}EcoTrack Submission Page{% endblock %}
+
+{% block head %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="{{ url_for('static', filename='css/FP.css') }}" />
+<link rel="stylesheet" href="{{ url_for('static', filename='css/submission-report.css') }}" />
+{% endblock %}
+
+{% block content %}
+<body class="min-h-screen flex flex-col items-center">
     <header
       class="w-full bg-[#fcf8e8] shadow-md border-b-2 border-b-[#f0e7d0] relative"
     >
@@ -116,17 +113,21 @@
         </div>
 
         <div>
-        <label
+          <label
             for="location"
             class="block text-sm font-medium text-[#4b553c] mb-1"
           >
             Location
             <span class="pill-label">(Location)</span>
-        </label>
-        <select id="location" name="location" required class="form-field">
-            <option value="">Select Location</option>
-            <!-- Options will be populated dynamically from the database -->
-        </select>
+          </label>
+          <input
+            type="text"
+            id="location"
+            name="location"
+            placeholder="Address, coordinates, or description of location"
+            required
+            class="form-field"
+          />
         </div>
 
         <div>
@@ -169,7 +170,10 @@
       </div>
     </div>
 
-    <script src="{{ url_for('static', filename='js/FP.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/submission-report.js') }}"></script>
-  </body>
-</html>
+    </body>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/FP.js') }}"></script>
+<script src="{{ url_for('static', filename='js/submission-report.js') }}"></script>
+{% endblock %}

@@ -1,26 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EcoTrack - Resources and Credits</title>
-    <!-- Load Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Use Inter font family -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/resources-credits.css') }}" />
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              "custom-tan": "#D9A779",
-            },
-          },
+{% extends 'base.html' %}
+
+{% block title %}EcoTrack - Resources and Credits{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/resources-credits.css') }}" />
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          "custom-tan": "#D9A779",
         },
-      };
-    </script>
-  </head>
-  <body class="min-h-screen flex flex-col">
+      },
+    },
+  };
+</script>
+{% endblock %}
+
+{% block content %}
+<body class="min-h-screen flex flex-col">
     <!-- Top Navigation/Header Banner -->
     <header class="header-bg shadow-lg p-4">
       <div
@@ -425,5 +423,6 @@ Greater musky fruit bat - Facts, Diet, Habitat & Pictures on Animalia.bio</a
         </div>
       </div>
     </main>
-  </body>
-</html>
+{% endblock %}
+
+{% block scripts %}{% endblock %}

@@ -1,13 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SDG 14 & 15: Life Below Water & Life on Land</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="FP.css" />
-  </head>
-  <body class="min-h-screen antialiased">
+{% extends 'base.html' %}
+
+{% block title %}SDG 14 & 15: Life Below Water & Life on Land{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/FP.css') }}" />
+{% endblock %}
+
+{% block content %}
+<body class="min-h-screen antialiased">
     <header class="bg-white shadow-lg sticky top-0 z-10">
       <div
         class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center"
@@ -174,7 +174,8 @@
           Understanding these goals is the first step toward achieving a
           sustainable and greater future.
         </p>
-      </section>
     </main>
   </body>
-</html>
+{% endblock %}
+
+{% block scripts %}{% endblock %}
