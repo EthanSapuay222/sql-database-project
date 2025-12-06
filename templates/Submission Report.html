@@ -120,14 +120,12 @@
             Location
             <span class="pill-label">(Location)</span>
           </label>
-          <input
-            type="text"
-            id="location"
-            name="location"
-            placeholder="Address, coordinates, or description of location"
-            required
-            class="form-field"
-          />
+          <select id="location" name="location" required class="form-field">
+            <option value="">Select a Location</option>
+            {% for location in locations %}
+            <option value="{{ location.city_name }}">{{ location.city_name }} ({{ location.location_type.capitalize() }})</option>
+            {% endfor %}
+          </select>
         </div>
 
         <div>

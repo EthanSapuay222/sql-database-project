@@ -59,16 +59,15 @@ def drop_tables(app):
 
 
 def test_connection():
-
+    """Test database connection"""
     try:
-        connection = pymysql.connect(
-            host=DatabaseConfig.DB_HOST,
-            port=DatabaseConfig.DB_PORT,
-            user=DatabaseConfig.DB_USER,
-            password=DatabaseConfig.DB_PASSWORD,
-            database=DatabaseConfig.DB_NAME
-        )
-        connection.close()
+        # Test using SQLAlchemy
+        from flask import Flask
+        app = Flask(__name__)
+        app.config['SQLALCHEMY_DATABASE_URI'] = build_sqlalchemy_uri_from_env()
+        db.init_app(app)
+        with app.app_context():
+            db.session.execute('SELECT 1')
         print("✅ Database connection successful!")
         return True
     except Exception as e:

@@ -466,8 +466,9 @@ def resources_view():
 
 @app.route('/submission-report')
 def submission_report_view():
-    """Submission report page (static template)"""
-    return render_template('Submission Report.html')
+    """Submission report page with locations from database"""
+    locations = Location.query.all()
+    return render_template('Submission Report.html', locations=locations)
 
 # ERROR HANDLERS
 

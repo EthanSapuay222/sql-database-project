@@ -1,16 +1,11 @@
-# ============================================
-# FILE: model.py
-# Database Models using SQLAlchemy
-# ============================================
-
 from database import db  # Import db from database.py
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
-# ============================================
+
 # SPECIES MODEL
-# ============================================
+
 class Species(db.Model):
     __tablename__ = 'species'
     
@@ -50,9 +45,8 @@ class Species(db.Model):
         return f'<Species {self.common_name}>'
 
 
-# ============================================
 # LOCATION MODEL
-# ============================================
+
 class Location(db.Model):
     __tablename__ = 'locations'
     
@@ -85,9 +79,9 @@ class Location(db.Model):
         return f'<Location {self.city_name}>'
 
 
-# ============================================
+
 # SIGHTING MODEL
-# ============================================
+
 class Sighting(db.Model):
     __tablename__ = 'sightings'
     
@@ -124,9 +118,9 @@ class Sighting(db.Model):
         return f'<Sighting {self.sighting_id} - {self.species.common_name if self.species else "Unknown"}>'
 
 
-# ============================================
+
 # ENVIRONMENTAL REPORT MODEL
-# ============================================
+
 class EnvironmentalReport(db.Model):
     __tablename__ = 'environmental_reports'
     
@@ -166,10 +160,8 @@ class EnvironmentalReport(db.Model):
     def __repr__(self):
         return f'<Report {self.report_id} - {self.title}>'
 
-
-# ============================================
 # USER MODEL
-# ============================================
+
 class User(db.Model):
     __tablename__ = 'users'
     
@@ -207,9 +199,9 @@ class User(db.Model):
         return f'<User {self.username}>'
 
 
-# ============================================
+
 # ACTIVITY LOG MODEL
-# ============================================
+
 class ActivityLog(db.Model):
     __tablename__ = 'activity_log'
     
@@ -237,9 +229,9 @@ class ActivityLog(db.Model):
         return f'<ActivityLog {self.log_id} - {self.action_type}>'
 
 
-# ============================================
+
 # DASHBOARD STATISTICS MODEL
-# ============================================
+
 class DashboardStats(db.Model):
     __tablename__ = 'dashboard_stats'
     
