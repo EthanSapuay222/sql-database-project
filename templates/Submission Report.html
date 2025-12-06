@@ -54,10 +54,28 @@
       <h1
         class="text-2xl font-extrabold text-[#4b553c] mb-6 border-b pb-2 text-center"
       >
-        Submit Environmental Report
+        Submit Report
       </h1>
 
-      <form id="report-form" class="space-y-6">
+      <!-- Tab Navigation -->
+      <div class="flex border-b border-gray-300 mb-6">
+        <button
+          id="tab-environmental"
+          class="tab-button active flex-1 py-3 px-4 text-center font-semibold transition-colors duration-200"
+        >
+          Environmental Report
+        </button>
+        <button
+          id="tab-sighting"
+          class="tab-button flex-1 py-3 px-4 text-center font-semibold transition-colors duration-200"
+        >
+          Animal Sighting
+        </button>
+      </div>
+
+      <!-- Environmental Report Form -->
+      <div id="form-environmental" class="form-container">
+        <form id="report-form" class="space-y-6">
         <div>
           <label
             for="report-title"
@@ -149,6 +167,120 @@
           Submit Report
         </button>
       </form>
+      </div>
+
+      <!-- Animal Sighting Form -->
+      <div id="form-sighting" class="form-container hidden">
+        <form id="sighting-form" class="space-y-6">
+          <div>
+            <label
+              for="species"
+              class="block text-sm font-medium text-[#4b553c] mb-1"
+            >
+              Species
+              <span class="pill-label">Select the animal species</span>
+            </label>
+            <select id="species" name="species" required class="form-field">
+              <option value="">Select a Species</option>
+            </select>
+          </div>
+
+          <div>
+            <label
+              for="sighting-location"
+              class="block text-sm font-medium text-[#4b553c] mb-1"
+            >
+              Location
+              <span class="pill-label">Where was it spotted?</span>
+            </label>
+            <select id="sighting-location" name="sighting-location" required class="form-field">
+              <option value="">Select a Location</option>
+              {% for location in locations %}
+              <option value="{{ location.location_id }}">{{ location.city_name }} ({{ location.location_type.capitalize() }})</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div>
+            <label
+              for="number-observed"
+              class="block text-sm font-medium text-[#4b553c] mb-1"
+            >
+              Number Observed
+              <span class="pill-label">How many did you see?</span>
+            </label>
+            <input
+              type="number"
+              id="number-observed"
+              name="number-observed"
+              min="1"
+              value="1"
+              required
+              class="form-field"
+            />
+          </div>
+
+          <div>
+            <label
+              for="observer-name"
+              class="block text-sm font-medium text-[#4b553c] mb-1"
+            >
+              Your Name
+              <span class="pill-label">Observer's name</span>
+            </label>
+            <input
+              type="text"
+              id="observer-name"
+              name="observer-name"
+              placeholder="John Doe"
+              required
+              class="form-field"
+            />
+          </div>
+
+          <div>
+            <label
+              for="observer-contact"
+              class="block text-sm font-medium text-[#4b553c] mb-1"
+            >
+              Contact Information
+              <span class="pill-label">Email or phone</span>
+            </label>
+            <input
+              type="text"
+              id="observer-contact"
+              name="observer-contact"
+              placeholder="email@example.com or phone number"
+              required
+              class="form-field"
+            />
+          </div>
+
+          <div>
+            <label
+              for="sighting-notes"
+              class="block text-sm font-medium text-[#4b553c] mb-1"
+            >
+              Additional Notes (Optional)
+              <span class="pill-label">Any observations or details</span>
+            </label>
+            <textarea
+              id="sighting-notes"
+              name="sighting-notes"
+              rows="4"
+              placeholder="Describe behavior, habitat, or any other relevant details..."
+              class="form-field"
+            ></textarea>
+          </div>
+
+          <button
+            type="submit"
+            class="w-full py-3 bg-[#4b8e48] hover:bg-[#5da85a] text-white font-bold rounded-lg shadow-lg transition duration-200 mt-6 text-lg"
+          >
+            Submit Sighting
+          </button>
+        </form>
+      </div>
 
       <div
         id="message-box"

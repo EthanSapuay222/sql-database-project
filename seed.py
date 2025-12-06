@@ -7,14 +7,19 @@ This script seeds the following tables:
   1. Locations (34 Batangas cities & municipalities)
   2. Report Categories (5 categories: Pollution, Deforestation, Waste Dumping, Wildlife Incident, Other)
   3. Report Severity Levels (4 levels: Low, Medium, High, Critical)
+  4. Species (20 species: 12 land, 8 water)
+  5. Sample Environmental Reports (10 test reports)
 
 Usage: python seed.py
 
 Tracking:
 - v1.0 (Dec 6, 2025): Initial combined seed with locations, categories, severity
+- v2.0 (Dec 6, 2025): Added species and sample reports seeding
 - Added locations: 34 Batangas locations with lat/long and severity levels
 - Added categories: 5 environmental report types
 - Added severity: 4-level severity scale
+- Added species: 20 species (land and water animals)
+- Added sample reports: 10 environmental reports for testing
 """
 
 import sys
@@ -22,8 +27,10 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from app import app
-from model import Location, ReportCategory, ReportSeverity
+from model import Location, ReportCategory, ReportSeverity, Species, EnvironmentalReport
 from database import db
+from datetime import date, timedelta
+import random
 
 
 # ============================================================================
@@ -34,42 +41,42 @@ from database import db
 
 SAMPLE_LOCATIONS = [
     # CITIES
-    {'city_name': 'Batangas City', 'latitude': 13.7562, 'location_type': 'city', 'longitude': 121.0573, 'severity_level': 'Critical'},
-    {'city_name': 'Calaca', 'latitude': 13.9303, 'location_type': 'city', 'longitude': 120.8128, 'severity_level': 'Low'},
-    {'city_name': 'Lipa City', 'latitude': 13.9483, 'location_type': 'city', 'longitude': 121.1683, 'severity_level': 'High'},
-    {'city_name': 'Santo Tomas', 'latitude': 14.08, 'location_type': 'city', 'longitude': 121.14, 'severity_level': 'Medium'},
-    {'city_name': 'Tanauan City', 'latitude': 14.0844, 'location_type': 'city', 'longitude': 121.1492, 'severity_level': 'Critical'},
+    {'city_name': 'Batangas City', 'latitude': 13.7565, 'location_type': 'city', 'longitude': 121.0583, 'severity_level': 'Critical'},
+    {'city_name': 'Calaca', 'latitude': 13.9167, 'location_type': 'city', 'longitude': 120.8167, 'severity_level': 'Low'},
+    {'city_name': 'Lipa City', 'latitude': 13.9411, 'location_type': 'city', 'longitude': 121.1622, 'severity_level': 'High'},
+    {'city_name': 'Santo Tomas', 'latitude': 14.1078, 'location_type': 'city', 'longitude': 121.1414, 'severity_level': 'Medium'},
+    {'city_name': 'Tanauan City', 'latitude': 14.0858, 'location_type': 'city', 'longitude': 121.1500, 'severity_level': 'Critical'},
 
     # MUNICIPALITIES
-    {'city_name': 'Agoncillo', 'latitude': 13.9342, 'location_type': 'municipality', 'longitude': 120.9283, 'severity_level': 'Low'},
-    {'city_name': 'Alitagtag', 'latitude': 13.8653, 'location_type': 'municipality', 'longitude': 121.0047, 'severity_level': 'Low'},
-    {'city_name': 'Balayan', 'latitude': 13.9442, 'location_type': 'municipality', 'longitude': 120.7336, 'severity_level': 'Medium'},
-    {'city_name': 'Balete', 'latitude': 14.0167, 'location_type': 'municipality', 'longitude': 121.0833, 'severity_level': 'Low'},
-    {'city_name': 'Bauan', 'latitude': 13.7925, 'location_type': 'municipality', 'longitude': 121.0078, 'severity_level': 'High'},
-    {'city_name': 'Calatagan', 'latitude': 13.8322, 'location_type': 'municipality', 'longitude': 120.6275, 'severity_level': 'Low'},
-    {'city_name': 'Cuenca', 'latitude': 13.9167, 'location_type': 'municipality', 'longitude': 121.05, 'severity_level': 'Medium'},
-    {'city_name': 'Ibaan', 'latitude': 13.8211, 'location_type': 'municipality', 'longitude': 121.1444, 'severity_level': 'Low'},
-    {'city_name': 'Laurel', 'latitude': 14.05, 'location_type': 'municipality', 'longitude': 120.9333, 'severity_level': 'Medium'},
-    {'city_name': 'Lemery', 'latitude': 13.9011, 'location_type': 'municipality', 'longitude': 120.8928, 'severity_level': 'Medium'},
-    {'city_name': 'Lian', 'latitude': 13.9875, 'location_type': 'municipality', 'longitude': 120.6558, 'severity_level': 'Low'},
-    {'city_name': 'Lobo', 'latitude': 13.6267, 'location_type': 'municipality', 'longitude': 121.2142, 'severity_level': 'High'},
-    {'city_name': 'Mabini', 'latitude': 13.7639, 'location_type': 'municipality', 'longitude': 120.9417, 'severity_level': 'Critical'},
-    {'city_name': 'Malvar', 'latitude': 14.0322, 'location_type': 'municipality', 'longitude': 121.155, 'severity_level': 'Low'},
-    {'city_name': 'Mataasnakahoy', 'latitude': 14.0203, 'location_type': 'municipality', 'longitude': 121.1111, 'severity_level': 'Medium'},
-    {'city_name': 'Nasugbu', 'latitude': 14.0722, 'location_type': 'municipality', 'longitude': 120.6358, 'severity_level': 'High'},
-    {'city_name': 'Padre Garcia', 'latitude': 13.8967, 'location_type': 'municipality', 'longitude': 121.2339, 'severity_level': 'Low'},
-    {'city_name': 'Rosario', 'latitude': 13.8589, 'location_type': 'municipality', 'longitude': 121.2339, 'severity_level': 'Medium'},
-    {'city_name': 'San Jose', 'latitude': 13.8825, 'location_type': 'municipality', 'longitude': 121.1067, 'severity_level': 'Low'},
-    {'city_name': 'San Juan', 'latitude': 13.8167, 'location_type': 'municipality', 'longitude': 121.3833, 'severity_level': 'Critical'},
-    {'city_name': 'San Luis', 'latitude': 13.8561, 'location_type': 'municipality', 'longitude': 120.9389, 'severity_level': 'Medium'},
-    {'city_name': 'San Nicolas', 'latitude': 13.9458, 'location_type': 'municipality', 'longitude': 120.9633, 'severity_level': 'High'},
-    {'city_name': 'San Pascual', 'latitude': 13.8058, 'location_type': 'municipality', 'longitude': 120.9828, 'severity_level': 'Medium'},
-    {'city_name': 'Santa Teresita', 'latitude': 13.85, 'location_type': 'municipality', 'longitude': 120.9833, 'severity_level': 'Low'},
-    {'city_name': 'Taal', 'latitude': 13.8767, 'location_type': 'municipality', 'longitude': 120.9233, 'severity_level': 'High'},
-    {'city_name': 'Talisay', 'latitude': 14.095, 'location_type': 'municipality', 'longitude': 121.0142, 'severity_level': 'Low'},
-    {'city_name': 'Taysan', 'latitude': 13.7667, 'location_type': 'municipality', 'longitude': 121.1714, 'severity_level': 'Medium'},
-    {'city_name': 'Tingloy', 'latitude': 13.7333, 'location_type': 'municipality', 'longitude': 120.8667, 'severity_level': 'Low'},
-    {'city_name': 'Tuy', 'latitude': 14.0167, 'location_type': 'municipality', 'longitude': 120.75, 'severity_level': 'Low'},
+    {'city_name': 'Agoncillo', 'latitude': 13.9333, 'location_type': 'municipality', 'longitude': 120.9333, 'severity_level': 'Low'},
+    {'city_name': 'Alitagtag', 'latitude': 13.8667, 'location_type': 'municipality', 'longitude': 121.0000, 'severity_level': 'Low'},
+    {'city_name': 'Balayan', 'latitude': 13.9389, 'location_type': 'municipality', 'longitude': 120.7333, 'severity_level': 'Medium'},
+    {'city_name': 'Balete', 'latitude': 13.9833, 'location_type': 'municipality', 'longitude': 121.1000, 'severity_level': 'Low'},
+    {'city_name': 'Bauan', 'latitude': 13.7917, 'location_type': 'municipality', 'longitude': 121.0089, 'severity_level': 'High'},
+    {'city_name': 'Calatagan', 'latitude': 13.8319, 'location_type': 'municipality', 'longitude': 120.6322, 'severity_level': 'Low'},
+    {'city_name': 'Cuenca', 'latitude': 13.9072, 'location_type': 'municipality', 'longitude': 121.0497, 'severity_level': 'Medium'},
+    {'city_name': 'Ibaan', 'latitude': 13.8167, 'location_type': 'municipality', 'longitude': 121.1333, 'severity_level': 'Low'},
+    {'city_name': 'Laurel', 'latitude': 14.0500, 'location_type': 'municipality', 'longitude': 120.9167, 'severity_level': 'Medium'},
+    {'city_name': 'Lemery', 'latitude': 13.9167, 'location_type': 'municipality', 'longitude': 120.8833, 'severity_level': 'Medium'},
+    {'city_name': 'Lian', 'latitude': 14.0333, 'location_type': 'municipality', 'longitude': 120.6500, 'severity_level': 'Low'},
+    {'city_name': 'Lobo', 'latitude': 13.6500, 'location_type': 'municipality', 'longitude': 121.2333, 'severity_level': 'High'},
+    {'city_name': 'Mabini', 'latitude': 13.7233, 'location_type': 'municipality', 'longitude': 120.8961, 'severity_level': 'Critical'},
+    {'city_name': 'Malvar', 'latitude': 14.0444, 'location_type': 'municipality', 'longitude': 121.1550, 'severity_level': 'Low'},
+    {'city_name': 'Mataasnakahoy', 'latitude': 13.9667, 'location_type': 'municipality', 'longitude': 121.1000, 'severity_level': 'Medium'},
+    {'city_name': 'Nasugbu', 'latitude': 14.0689, 'location_type': 'municipality', 'longitude': 120.6317, 'severity_level': 'High'},
+    {'city_name': 'Padre Garcia', 'latitude': 13.8833, 'location_type': 'municipality', 'longitude': 121.2167, 'severity_level': 'Low'},
+    {'city_name': 'Rosario', 'latitude': 13.8472, 'location_type': 'municipality', 'longitude': 121.2056, 'severity_level': 'Medium'},
+    {'city_name': 'San Jose', 'latitude': 13.8806, 'location_type': 'municipality', 'longitude': 121.0931, 'severity_level': 'Low'},
+    {'city_name': 'San Juan', 'latitude': 13.8333, 'location_type': 'municipality', 'longitude': 121.4000, 'severity_level': 'Critical'},
+    {'city_name': 'San Luis', 'latitude': 13.8500, 'location_type': 'municipality', 'longitude': 120.9500, 'severity_level': 'Medium'},
+    {'city_name': 'San Nicolas', 'latitude': 13.9167, 'location_type': 'municipality', 'longitude': 120.9667, 'severity_level': 'High'},
+    {'city_name': 'San Pascual', 'latitude': 13.8083, 'location_type': 'municipality', 'longitude': 121.0275, 'severity_level': 'Medium'},
+    {'city_name': 'Santa Teresita', 'latitude': 13.8333, 'location_type': 'municipality', 'longitude': 121.0000, 'severity_level': 'Low'},
+    {'city_name': 'Taal', 'latitude': 13.8833, 'location_type': 'municipality', 'longitude': 120.9333, 'severity_level': 'High'},
+    {'city_name': 'Talisay', 'latitude': 14.1000, 'location_type': 'municipality', 'longitude': 121.0167, 'severity_level': 'Low'},
+    {'city_name': 'Taysan', 'latitude': 13.7667, 'location_type': 'municipality', 'longitude': 121.2167, 'severity_level': 'Medium'},
+    {'city_name': 'Tingloy', 'latitude': 13.6667, 'location_type': 'municipality', 'longitude': 120.8833, 'severity_level': 'Low'},
+    {'city_name': 'Tuy', 'latitude': 14.0167, 'location_type': 'municipality', 'longitude': 120.7333, 'severity_level': 'Low'},
 ]
 
 
@@ -99,6 +106,330 @@ SAMPLE_SEVERITY = [
     {'level': 'Medium', 'description': 'Moderate impact, should be addressed soon'},
     {'level': 'High', 'description': 'Significant impact, requires prompt action'},
     {'level': 'Critical', 'description': 'Severe impact, immediate action required'},
+]
+
+
+# ============================================================================
+# SECTION 4: SPECIES DATA
+# ============================================================================
+# 20 species: 12 land animals, 8 water animals
+# Used in Life on Land and Water page and animal sighting submissions
+
+LAND_SPECIES = [
+    # Birds
+    {
+        'common_name': 'Philippine Duck',
+        'scientific_name': 'Anas luzonica',
+        'category': 'land',
+        'species_type': 'bird',
+        'conservation_status': 'Least Concern',
+        'status_trend': 'stable',
+        'total_sightings_estimate': '15,000-30,000',
+        'description': 'Sporting brown plumage and a distinctive blue-grey bill, this species charms with its subtle beauty and surprises with its adaptability.'
+    },
+    {
+        'common_name': 'White-breasted Waterhen',
+        'scientific_name': 'Amaurornis phoenicurus',
+        'category': 'land',
+        'species_type': 'bird',
+        'conservation_status': 'Least Concern',
+        'status_trend': 'stable',
+        'total_sightings_estimate': '10,000-100,000',
+        'description': 'Adult White-breasted waterhens have mainly dark grey upperparts and flanks, and a white face, neck, and breast. The lower belly and undertail are cinnamon or white colored.'
+    },
+    {
+        'common_name': 'Garden Sunbird',
+        'scientific_name': 'Cinnyris jugularis',
+        'category': 'land',
+        'species_type': 'bird',
+        'conservation_status': 'Least Concern',
+        'status_trend': 'stable',
+        'total_sightings_estimate': '15,000-25,000',
+        'description': 'A beautifully colored passerine bird from Southeast Asia. It has a long downward-curved bill which it uses to take nectar and capture insects.'
+    },
+    {
+        'common_name': 'Collared Kingfisher',
+        'scientific_name': 'Todiramphus chloris',
+        'category': 'land',
+        'species_type': 'bird',
+        'conservation_status': 'Least Concern',
+        'status_trend': 'stable',
+        'total_sightings_estimate': 'Unknown',
+        'description': 'It hunts insects, crabs and small fish by perching and quickly diving its prey. This species is widespread and easily spotted due to its loud calls.'
+    },
+    
+    # Mammals
+    {
+        'common_name': 'Greater Musky Fruit Bat',
+        'scientific_name': 'Ptenochirus jagori',
+        'category': 'land',
+        'species_type': 'mammal',
+        'conservation_status': 'Least Concern',
+        'status_trend': 'stable',
+        'total_sightings_estimate': 'Not specified yet',
+        'description': 'A captivating creature of the night, found gracefully navigating the tropical forests of Southeast Asia. These fascinating bats play a vital role in their ecosystems.'
+    },
+    {
+        'common_name': 'Luzon Giant Cloud Rat',
+        'scientific_name': 'Phloeomys pallidus',
+        'category': 'land',
+        'species_type': 'mammal',
+        'conservation_status': 'Concerned',
+        'status_trend': 'stable',
+        'total_sightings_estimate': 'Unknown',
+        'description': 'This rodent has a relatively long pelage, which also covers the tail. The color is highly variable, but it is usually pale brown-grey or white with some dark brown or black patches.'
+    },
+    {
+        'common_name': 'Lion',
+        'scientific_name': 'Panthera leo',
+        'category': 'land',
+        'species_type': 'mammal',
+        'conservation_status': 'Vulnerable',
+        'status_trend': 'decreasing',
+        'total_sightings_estimate': '23,000-39,000',
+        'description': 'The lion is a big wild cat with short, tawny-colored fur and white underparts. The long tail ends with a black tuft.'
+    },
+    {
+        'common_name': 'Philippine Warty Pig',
+        'scientific_name': 'Sus philippensis',
+        'category': 'land',
+        'species_type': 'mammal',
+        'conservation_status': 'Vulnerable',
+        'status_trend': 'decreasing',
+        'total_sightings_estimate': 'Unknown',
+        'description': 'A wild pig species with a distinctive "mane" and warty face. Important for nutrient cycling in forests.'
+    },
+    {
+        'common_name': 'Philippine Long-Tailed Macaque',
+        'scientific_name': 'Macaca fascicularis philippensis',
+        'category': 'land',
+        'species_type': 'mammal',
+        'conservation_status': 'Least Concern',
+        'status_trend': 'decreasing',
+        'total_sightings_estimate': 'Unknown',
+        'description': 'Lives in group and eat fruits, leaves, and small animals, making it very adaptable. However, its population is decreasing due to habitat loss and trapping.'
+    },
+    
+    # Reptiles
+    {
+        'common_name': 'Tokay Gecko',
+        'scientific_name': 'Gekko gecko',
+        'category': 'land',
+        'species_type': 'reptile',
+        'conservation_status': 'Least Concern',
+        'status_trend': 'stable',
+        'total_sightings_estimate': 'Unknown',
+        'description': 'The skin of Tokay geckos is soft to the touch and is generally gray with red speckles. However, Tokay geckos can change the color of their skin to blend into the environment.'
+    },
+    {
+        'common_name': 'Reticulated Python',
+        'scientific_name': 'Malayopython reticulatus',
+        'category': 'land',
+        'species_type': 'reptile',
+        'conservation_status': 'Least Concern',
+        'status_trend': 'stable',
+        'total_sightings_estimate': 'Unknown',
+        'description': 'Is a non-venomous snake native to South and Southeast Asia. It is the world\'s longest snake and is among the three heaviest snakes.'
+    },
+    {
+        'common_name': 'Common House Gecko',
+        'scientific_name': 'Hemidactylus frenatus',
+        'category': 'land',
+        'species_type': 'reptile',
+        'conservation_status': 'Least Concern',
+        'status_trend': 'stable',
+        'total_sightings_estimate': 'Unknown',
+        'description': 'A small lizard native to Southeast Asia. They are named so because they are often seen climbing walls of houses and other buildings in search of insects.'
+    },
+]
+
+WATER_SPECIES = [
+    # Sea Turtles
+    {
+        'common_name': 'Olive Ridley Turtle',
+        'scientific_name': 'Lepidochelys olivacea',
+        'category': 'water',
+        'species_type': 'reptile',
+        'conservation_status': 'Vulnerable',
+        'status_trend': 'unknown',
+        'total_sightings_estimate': 'Unknown',
+        'description': 'A small to medium sea turtle known for its olive colored shell. They are famous for nesting events called "arribadas". They feed on jellyfish, small fish, crustaceans.'
+    },
+    {
+        'common_name': 'Green Turtle',
+        'scientific_name': 'Chelonia mydas',
+        'category': 'water',
+        'species_type': 'reptile',
+        'conservation_status': 'Endangered',
+        'status_trend': 'unknown',
+        'total_sightings_estimate': 'Unknown',
+        'description': 'Large herbivorous sea turtle often found near coral reefs and seagrass beds. Adults eat sea grass, helping maintain healthy marine ecosystems.'
+    },
+    {
+        'common_name': 'Hawksbill Turtle',
+        'scientific_name': 'Eretmochelys imbricata',
+        'category': 'water',
+        'species_type': 'reptile',
+        'conservation_status': 'Critically Endangered',
+        'status_trend': 'unknown',
+        'total_sightings_estimate': 'Unknown',
+        'description': 'Critically endangered turtle known for its beautifully patterned shell. They help control sponge populations on coral reefs.'
+    },
+    
+    # Fish/Sharks
+    {
+        'common_name': 'Whale Shark',
+        'scientific_name': 'Rhincodon typus',
+        'category': 'water',
+        'species_type': 'fish',
+        'conservation_status': 'Endangered',
+        'status_trend': 'decreasing',
+        'total_sightings_estimate': 'Unknown',
+        'description': 'The world\'s largest fish. A gentle filter feeder eating plankton and small fish. Important to ocean plankton balance.'
+    },
+    {
+        'common_name': 'Blacktip Reef Shark',
+        'scientific_name': 'Carcharhinus melanopterus',
+        'category': 'water',
+        'species_type': 'fish',
+        'conservation_status': 'Near Threatened',
+        'status_trend': 'unknown',
+        'total_sightings_estimate': 'Unknown',
+        'description': 'A small reef shark with black-tipped fins. Lives in shallow water and coral reefs. Plays a role in keeping fish populations balanced.'
+    },
+    
+    # Rays
+    {
+        'common_name': 'Manta Rays',
+        'scientific_name': 'Mobula alfredi, Mobula birostris',
+        'category': 'water',
+        'species_type': 'fish',
+        'conservation_status': 'Vulnerable',
+        'status_trend': 'unknown',
+        'total_sightings_estimate': 'Unknown',
+        'description': 'Large, gentle rays called "sea butterflies". Filter feeding on plankton. Highly intelligent and long lived.'
+    },
+    
+    # Marine Mammals
+    {
+        'common_name': 'Spinner Dolphin',
+        'scientific_name': 'Stenella longirostris',
+        'category': 'water',
+        'species_type': 'mammal',
+        'conservation_status': 'Vulnerable',
+        'status_trend': 'unknown',
+        'total_sightings_estimate': 'Unknown',
+        'description': 'Small, active dolphins known for spinning jumps. Feed on small fish and squid. Important part of marine food chain.'
+    },
+    {
+        'common_name': 'Dwarf Sperm Whale',
+        'scientific_name': 'Kogia sima',
+        'category': 'water',
+        'species_type': 'mammal',
+        'conservation_status': 'Data Deficient',
+        'status_trend': 'unknown',
+        'total_sightings_estimate': 'Unknown',
+        'description': 'A small, shy whale species rarely seen alive. Known for releasing a cloud of ink-like fluid to escape predators.'
+    },
+]
+
+
+# ============================================================================
+# SECTION 5: SAMPLE REPORTS DATA
+# ============================================================================
+# 10 sample environmental reports for testing dashboard and map
+
+SAMPLE_REPORTS = [
+    {
+        'title': 'Illegal Waste Dumping at Batangas City Port',
+        'description': 'Large amounts of industrial waste found dumped near the port area. Immediate cleanup required.',
+        'report_type': 'pollution',
+        'severity': 'Critical',
+        'reporter_name': 'Juan Dela Cruz',
+        'reporter_contact': 'juan@email.com',
+        'status': 'pending'
+    },
+    {
+        'title': 'Deforestation in Taal Watershed',
+        'description': 'Unauthorized tree cutting observed in the protected watershed area.',
+        'report_type': 'habitat_loss',
+        'severity': 'High',
+        'reporter_name': 'Maria Santos',
+        'reporter_contact': 'maria@email.com',
+        'status': 'in_progress'
+    },
+    {
+        'title': 'Plastic Pollution at Nasugbu Beach',
+        'description': 'Excessive plastic waste accumulating along the shoreline, affecting marine life.',
+        'report_type': 'pollution',
+        'severity': 'High',
+        'reporter_name': 'Pedro Reyes',
+        'reporter_contact': '09123456789',
+        'status': 'pending'
+    },
+    {
+        'title': 'Wildlife Trafficking Suspected',
+        'description': 'Reports of illegal bird trading in the local market area.',
+        'report_type': 'wildlife_incident',
+        'severity': 'Critical',
+        'reporter_name': 'Ana Garcia',
+        'reporter_contact': 'ana.garcia@email.com',
+        'status': 'in_progress'
+    },
+    {
+        'title': 'Water Pollution in Tanauan River',
+        'description': 'Factory discharge causing water discoloration and fish kill.',
+        'report_type': 'pollution',
+        'severity': 'High',
+        'reporter_name': 'Carlos Manuel',
+        'reporter_contact': '09187654321',
+        'status': 'pending'
+    },
+    {
+        'title': 'Illegal Fishing Activity',
+        'description': 'Use of dynamite fishing reported in coastal areas of Mabini.',
+        'report_type': 'illegal_activity',
+        'severity': 'Critical',
+        'reporter_name': 'Rosa Mendoza',
+        'reporter_contact': 'rosa.m@email.com',
+        'status': 'completed'
+    },
+    {
+        'title': 'Air Quality Concerns in Lipa City',
+        'description': 'Increased smoke emissions from industrial area affecting residents.',
+        'report_type': 'pollution',
+        'severity': 'Medium',
+        'reporter_name': 'Jose Villanueva',
+        'reporter_contact': 'jose.v@email.com',
+        'status': 'in_progress'
+    },
+    {
+        'title': 'Coral Reef Damage',
+        'description': 'Boat anchors damaging coral formations in Tingloy marine sanctuary.',
+        'report_type': 'habitat_loss',
+        'severity': 'High',
+        'reporter_name': 'Lisa Fernandez',
+        'reporter_contact': '09162345678',
+        'status': 'pending'
+    },
+    {
+        'title': 'Noise Pollution from Construction',
+        'description': 'Excessive noise during late hours affecting wildlife in Santo Tomas.',
+        'report_type': 'other',
+        'severity': 'Low',
+        'reporter_name': 'Roberto Cruz',
+        'reporter_contact': 'roberto@email.com',
+        'status': 'completed'
+    },
+    {
+        'title': 'Mangrove Clearing in Balayan',
+        'description': 'Illegal clearing of mangrove forest for construction purposes.',
+        'report_type': 'habitat_loss',
+        'severity': 'Critical',
+        'reporter_name': 'Elena Torres',
+        'reporter_contact': 'elena.t@email.com',
+        'status': 'in_progress'
+    }
 ]
 
 
@@ -201,6 +532,94 @@ def seed_severity():
     return inserted, updated
 
 
+def seed_species():
+    """Seed species table with land and water species"""
+    inserted = 0
+    updated = 0
+
+    # Seed Land Species
+    for species_data in LAND_SPECIES:
+        existing = Species.query.filter_by(common_name=species_data['common_name']).first()
+        if existing:
+            # Update if changed
+            changed = False
+            for key, value in species_data.items():
+                if getattr(existing, key) != value:
+                    setattr(existing, key, value)
+                    changed = True
+            if changed:
+                updated += 1
+        else:
+            new_species = Species(**species_data)
+            db.session.add(new_species)
+            inserted += 1
+
+    # Seed Water Species
+    for species_data in WATER_SPECIES:
+        existing = Species.query.filter_by(common_name=species_data['common_name']).first()
+        if existing:
+            # Update if changed
+            changed = False
+            for key, value in species_data.items():
+                if getattr(existing, key) != value:
+                    setattr(existing, key, value)
+                    changed = True
+            if changed:
+                updated += 1
+        else:
+            new_species = Species(**species_data)
+            db.session.add(new_species)
+            inserted += 1
+
+    if inserted or updated:
+        db.session.commit()
+
+    return inserted, updated
+
+
+def seed_sample_reports():
+    """Seed sample environmental reports for testing"""
+    inserted = 0
+    
+    # Get all locations
+    locations = Location.query.all()
+    if not locations:
+        print("      ⚠️  No locations found! Skipping sample reports.")
+        return 0
+    
+    # Clear existing reports
+    EnvironmentalReport.query.delete()
+    
+    # Add sample reports
+    for report_data in SAMPLE_REPORTS:
+        # Randomly assign location
+        location = random.choice(locations)
+        
+        # Create report with dates in the past few days
+        days_ago = random.randint(0, 14)
+        report_date = date.today() - timedelta(days=days_ago)
+        
+        new_report = EnvironmentalReport(
+            location_id=location.location_id,
+            title=report_data['title'],
+            description=report_data['description'],
+            report_type=report_data['report_type'],
+            severity=report_data['severity'],
+            status=report_data['status'],
+            reporter_name=report_data['reporter_name'],
+            reporter_contact=report_data['reporter_contact'],
+            report_date=report_date
+        )
+        
+        db.session.add(new_report)
+        inserted += 1
+    
+    if inserted:
+        db.session.commit()
+    
+    return inserted
+
+
 def main():
     """Run all seeding operations"""
     with app.app_context():
@@ -209,27 +628,39 @@ def main():
         print("=" * 70)
 
         # Seed Locations
-        print("\n[1/3] Seeding Locations (34 Batangas cities & municipalities)...")
+        print("\n[1/5] Seeding Locations (34 Batangas cities & municipalities)...")
         loc_inserted, loc_updated = seed_locations()
         print(f"      ✅ Locations - Inserted: {loc_inserted}, Updated: {loc_updated}")
 
         # Seed Categories
-        print("\n[2/3] Seeding Report Categories (5 types)...")
+        print("\n[2/5] Seeding Report Categories (5 types)...")
         cat_inserted, cat_updated = seed_categories()
         print(f"      ✅ Categories - Inserted: {cat_inserted}, Updated: {cat_updated}")
 
         # Seed Severity
-        print("\n[3/3] Seeding Report Severity Levels (4 levels)...")
+        print("\n[3/5] Seeding Report Severity Levels (4 levels)...")
         sev_inserted, sev_updated = seed_severity()
         print(f"      ✅ Severity Levels - Inserted: {sev_inserted}, Updated: {sev_updated}")
+
+        # Seed Species
+        print("\n[4/5] Seeding Species (20 land and water animals)...")
+        spec_inserted, spec_updated = seed_species()
+        print(f"      ✅ Species - Inserted: {spec_inserted}, Updated: {spec_updated}")
+
+        # Seed Sample Reports
+        print("\n[5/5] Seeding Sample Environmental Reports (10 test reports)...")
+        rep_inserted = seed_sample_reports()
+        print(f"      ✅ Sample Reports - Inserted: {rep_inserted}")
 
         print("\n" + "=" * 70)
         print("✅ SEEDING COMPLETE!")
         print("=" * 70)
         print(f"\nTotal Summary:")
-        print(f"  - Locations:  {loc_inserted} inserted, {loc_updated} updated")
-        print(f"  - Categories: {cat_inserted} inserted, {cat_updated} updated")
-        print(f"  - Severity:   {sev_inserted} inserted, {sev_updated} updated")
+        print(f"  - Locations:       {loc_inserted} inserted, {loc_updated} updated")
+        print(f"  - Categories:      {cat_inserted} inserted, {cat_updated} updated")
+        print(f"  - Severity:        {sev_inserted} inserted, {sev_updated} updated")
+        print(f"  - Species:         {spec_inserted} inserted, {spec_updated} updated")
+        print(f"  - Sample Reports:  {rep_inserted} inserted")
         print("\n")
 
 

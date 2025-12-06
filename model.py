@@ -130,14 +130,12 @@ class Sighting(db.Model):
     sighting_id = db.Column(db.Integer, primary_key=True)
     species_id = db.Column(db.Integer, db.ForeignKey('species.species_id'), nullable=False)
     location_id = db.Column(db.Integer, db.ForeignKey('locations.location_id'), nullable=False)
-    sighting_date = db.Column(db.Date, nullable=False)
-    sighting_time = db.Column(db.Time)
+    sighting_date = db.Column(db.Date, nullable=False, default=datetime.utcnow)
     number_observed = db.Column(db.Integer, default=1)
     observer_name = db.Column(db.String(100))
     observer_contact = db.Column(db.String(100))
     verification_status = db.Column(db.Enum('pending', 'verified', 'rejected'), default='pending')
     notes = db.Column(db.Text)
-    photo_url = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     def to_dict(self):
@@ -146,13 +144,11 @@ class Sighting(db.Model):
             'species': self.species.to_dict() if self.species else None,
             'location': self.location.to_dict() if self.location else None,
             'sighting_date': self.sighting_date.isoformat(),
-            'sighting_time': self.sighting_time.isoformat() if self.sighting_time else None,
             'number_observed': self.number_observed,
             'observer_name': self.observer_name,
             'observer_contact': self.observer_contact,
             'verification_status': self.verification_status,
             'notes': self.notes,
-            'photo_url': self.photo_url,
             'created_at': self.created_at.isoformat()
         }
     

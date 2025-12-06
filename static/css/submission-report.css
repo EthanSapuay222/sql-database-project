@@ -11,3 +11,33 @@ body {
 .header-bg {
   background-color: #d9a779;
 }
+
+/* Tab Styles */
+.tab-button {
+  background-color: transparent;
+  color: #6b7280;
+  border: none;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+}
+
+.tab-button:hover {
+  color: #4b553c;
+  background-color: #f9f9f9;
+}
+
+.tab-button.active {
+  color: #4b553c;
+  border-bottom: 3px solid #6d8e48;
+  background-color: #ffffff;
+}
+
+/* Form Container */
+.form-container {
+  display: block;
+}
+
+.form-container.hidden {
+  display: none;
+}
+

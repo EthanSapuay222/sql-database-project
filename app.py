@@ -165,7 +165,7 @@ def create_sighting():
         data = request.get_json()
         
         # Validate required fields
-        required_fields = ['species_id', 'location_id', 'sighting_date', 'observer_name', 'observer_contact']
+        required_fields = ['species_id', 'location_id', 'observer_name', 'observer_contact']
         for field in required_fields:
             if field not in data:
                 return jsonify({
@@ -177,13 +177,10 @@ def create_sighting():
         new_sighting = Sighting(
             species_id=data['species_id'],
             location_id=data['location_id'],
-            sighting_date=datetime.strptime(data['sighting_date'], '%Y-%m-%d').date(),
-            sighting_time=datetime.strptime(data['sighting_time'], '%H:%M:%S').time() if data.get('sighting_time') else None,
             number_observed=data.get('number_observed', 1),
             observer_name=data['observer_name'],
             observer_contact=data['observer_contact'],
-            notes=data.get('notes'),
-            photo_url=data.get('photo_url')
+            notes=data.get('notes')
         )
         
         db.session.add(new_sighting)
@@ -497,7 +494,10 @@ def map_view():
 
 @app.route('/species')
 def species_view():
-    return render_template('Life on Land and Water.html')
+    """Species page with all land and water animals from database"""
+    land_species = Species.query.filter_by(category='land').all()
+    water_species = Species.query.filter_by(category='water').all()
+    return render_template('Life on Land and Water.html', land_species=land_species, water_species=water_species)
 
 
 @app.route('/dashboard')

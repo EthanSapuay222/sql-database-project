@@ -1,6 +1,6 @@
 // Submission Report Configuration and Initialization
 
-// Fetch and populate locations from database
+// Fetch and populate locations from database for environmental report
 async function loadLocations() {
   try {
     const response = await fetch('/api/locations');
@@ -36,6 +36,42 @@ async function loadLocations() {
   }
 }
 
+// Fetch and populate species from database
+async function loadSpecies() {
+  try {
+    const response = await fetch('/api/species');
+    const data = await response.json();
+    
+    if (data.success) {
+      const speciesSelect = document.getElementById('species');
+      
+      // Clear existing options except the first one
+      speciesSelect.innerHTML = '<option value="">Select a Species</option>';
+      
+      // Sort species alphabetically by common name
+      const sortedSpecies = data.data.sort((a, b) => 
+        a.common_name.localeCompare(b.common_name)
+      );
+      
+      // Add options for each species
+      sortedSpecies.forEach(species => {
+        const option = document.createElement('option');
+        option.value = species.species_id;
+        option.textContent = `${species.common_name} (${species.scientific_name})`;
+        speciesSelect.appendChild(option);
+      });
+      
+      console.log('Species loaded successfully:', sortedSpecies.length);
+    } else {
+      console.error('Failed to load species:', data.message);
+      showMessage('Failed to load species. Please refresh the page.', 'error');
+    }
+  } catch (error) {
+    console.error('Error fetching species:', error);
+    showMessage('Error loading species. Please refresh the page.', 'error');
+  }
+}
+
 // Helper function to show messages
 function showMessage(message, type = 'success') {
   const messageBox = document.getElementById('message-box');
@@ -59,18 +95,43 @@ function capitalizeFirstLetter(string) {
 
 document.addEventListener('DOMContentLoaded', function() {
   const reportForm = document.getElementById('report-form');
+  const sightingForm = document.getElementById('sighting-form');
   const messageBox = document.getElementById('message-box');
   const userIdDisplay = document.getElementById('user-id-display');
   
-  // Load locations on page load
+  // Tab switching
+  const tabEnvironmental = document.getElementById('tab-environmental');
+  const tabSighting = document.getElementById('tab-sighting');
+  const formEnvironmental = document.getElementById('form-environmental');
+  const formSighting = document.getElementById('form-sighting');
+  
+  // Tab click handlers
+  tabEnvironmental.addEventListener('click', function() {
+    tabEnvironmental.classList.add('active');
+    tabSighting.classList.remove('active');
+    formEnvironmental.classList.remove('hidden');
+    formSighting.classList.add('hidden');
+    messageBox.classList.add('hidden');
+  });
+  
+  tabSighting.addEventListener('click', function() {
+    tabSighting.classList.add('active');
+    tabEnvironmental.classList.remove('active');
+    formSighting.classList.remove('hidden');
+    formEnvironmental.classList.add('hidden');
+    messageBox.classList.add('hidden');
+  });
+  
+  // Load data on page load
   loadLocations();
+  loadSpecies();
   
   // Update status display
   if (userIdDisplay) {
     userIdDisplay.innerHTML = '<span class="font-bold">Status:</span> Form Ready';
   }
   
-  // Handle form submission
+  // Handle environmental report form submission
   if (reportForm) {
     reportForm.addEventListener('submit', async function(e) {
       e.preventDefault();
@@ -95,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function() {
         report_type: category,
         location_id: parseInt(locationId),
         severity: capitalizeFirstLetter(severity),
-        reporter_name: 'Anonymous', // You can add input fields for these if needed
+        reporter_name: 'Anonymous',
         reporter_contact: 'N/A',
         report_date: new Date().toISOString().split('T')[0]
       };
@@ -123,12 +184,9 @@ document.addEventListener('DOMContentLoaded', function() {
           setTimeout(function() {
             reportForm.reset();
             messageBox.classList.add('hidden');
-            
-            // Reload locations to refresh the dropdown
             loadLocations();
           }, 2000);
           
-          // Update status
           if (userIdDisplay) {
             userIdDisplay.innerHTML = '<span class="font-bold">Status:</span> Form Ready';
           }
@@ -145,6 +203,79 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (userIdDisplay) {
           userIdDisplay.innerHTML = '<span class="font-bold">Status:</span> Connection Error';
+        }
+      }
+    });
+  }
+  
+  // Handle animal sighting form submission
+  if (sightingForm) {
+    sightingForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(sightingForm);
+      const speciesId = formData.get('species');
+      const locationId = formData.get('sighting-location');
+      const numberObserved = formData.get('number-observed');
+      const observerName = formData.get('observer-name');
+      const observerContact = formData.get('observer-contact');
+      const notes = formData.get('sighting-notes');
+      
+      // Validate required fields
+      if (!speciesId || !locationId || !observerName || !observerContact) {
+        showMessage('Please fill in all required fields.', 'error');
+        return;
+      }
+      
+      // Prepare submission data
+      const sightingData = {
+        species_id: parseInt(speciesId),
+        location_id: parseInt(locationId),
+        number_observed: parseInt(numberObserved) || 1,
+        observer_name: observerName,
+        observer_contact: observerContact,
+        notes: notes || null
+      };
+      
+      if (userIdDisplay) {
+        userIdDisplay.innerHTML = '<span class="font-bold">Status:</span> Submitting...';
+      }
+      
+      try {
+        const response = await fetch('/api/sightings', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(sightingData),
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          showMessage('Animal sighting submitted successfully! Thank you for contributing.', 'success');
+          if (userIdDisplay) {
+            userIdDisplay.innerHTML = '<span class="font-bold">Status:</span> Form Ready';
+          }
+          
+          // Reset form
+          setTimeout(function() {
+            sightingForm.reset();
+            document.getElementById('number-observed').value = '1';
+            messageBox.classList.add('hidden');
+          }, 2000);
+          
+        } else {
+          showMessage(`Submission failed: ${result.message}`, 'error');
+          if (userIdDisplay) {
+            userIdDisplay.innerHTML = '<span class="font-bold">Status:</span> Submission Failed';
+          }
+        }
+      } catch (error) {
+        console.error('Error submitting sighting:', error);
+        showMessage('An error occurred while submitting. Please try again.', 'error');
+        if (userIdDisplay) {
+          userIdDisplay.innerHTML = '<span class="font-bold">Status:</span> Error occurred';
         }
       }
     });
