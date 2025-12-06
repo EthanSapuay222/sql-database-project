@@ -10,7 +10,8 @@ from database import init_db, create_tables, db
 # Import models
 from model import (
     Species, Location, Sighting, EnvironmentalReport, 
-    User, ActivityLog, DashboardStats
+    User, ActivityLog, DashboardStats,
+    ReportCategory, ReportSeverity
 )
 
 # Import forms
@@ -236,6 +237,29 @@ def update_sighting_status(sighting_id):
             'message': f'Error updating sighting: {str(e)}'
         }), 500
 
+
+@app.route('/api/categories', methods=['GET'])
+def get_categories():
+    """Get all report categories"""
+    categories = ReportCategory.query.all()
+    return jsonify({
+        'success': True,
+        'count': len(categories),
+        'data': [c.to_dict() for c in categories]
+    })
+
+
+@app.route('/api/severity', methods=['GET'])
+def get_severity():
+    """Get all report severity levels"""
+    severity_levels = ReportSeverity.query.all()
+    return jsonify({
+        'success': True,
+        'count': len(severity_levels),
+        'data': [s.to_dict() for s in severity_levels]
+    })
+
+
 @app.route('/api/reports', methods=['GET'])
 def get_reports():
     """
@@ -314,7 +338,37 @@ def create_report():
             location.total_reports += 1
         
         db.session.commit()
-        
+
+        # Update today's dashboard stats (incremental)
+        try:
+            today = date.today()
+            stats = DashboardStats.query.filter_by(stat_date=today).first()
+            if stats:
+                stats.total_reports = stats.total_reports + 1
+                if new_report.status == 'pending':
+                    stats.pending_reports = stats.pending_reports + 1
+                if new_report.severity == 'Critical':
+                    stats.critical_reports = stats.critical_reports + 1
+                db.session.commit()
+            else:
+                # Create fresh stats for today
+                stats = DashboardStats(
+                    stat_date=today,
+                    total_reports=EnvironmentalReport.query.count(),
+                    pending_reports=EnvironmentalReport.query.filter_by(status='pending').count(),
+                    completed_reports=EnvironmentalReport.query.filter_by(status='completed').count(),
+                    critical_reports=EnvironmentalReport.query.filter_by(severity='Critical').count(),
+                    total_sightings=Sighting.query.count(),
+                    verified_sightings=Sighting.query.filter_by(verification_status='verified').count(),
+                    land_species_count=Species.query.filter_by(category='land').count(),
+                    water_species_count=Species.query.filter_by(category='water').count()
+                )
+                db.session.add(stats)
+                db.session.commit()
+        except Exception:
+            # Non-fatal: do not block report creation if dashboard update fails
+            db.session.rollback()
+
         return jsonify({
             'success': True,
             'message': 'Report submitted successfully',
@@ -466,9 +520,11 @@ def resources_view():
 
 @app.route('/submission-report')
 def submission_report_view():
-    """Submission report page with locations from database"""
+    """Submission report page with locations, categories, and severity from database"""
     locations = Location.query.all()
-    return render_template('Submission Report.html', locations=locations)
+    categories = ReportCategory.query.all()
+    severity = ReportSeverity.query.all()
+    return render_template('Submission Report.html', locations=locations, categories=categories, severity=severity)
 
 # ERROR HANDLERS
 

@@ -45,6 +45,48 @@ class Species(db.Model):
         return f'<Species {self.common_name}>'
 
 
+# REPORT CATEGORY MODEL
+
+class ReportCategory(db.Model):
+    __tablename__ = 'report_categories'
+    
+    category_id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True, nullable=False)
+    description = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def to_dict(self):
+        return {
+            'category_id': self.category_id,
+            'name': self.name,
+            'description': self.description
+        }
+    
+    def __repr__(self):
+        return f'<ReportCategory {self.name}>'
+
+
+# REPORT SEVERITY MODEL
+
+class ReportSeverity(db.Model):
+    __tablename__ = 'report_severity'
+    
+    severity_id = db.Column(db.Integer, primary_key=True)
+    level = db.Column(db.String(50), unique=True, nullable=False)
+    description = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def to_dict(self):
+        return {
+            'severity_id': self.severity_id,
+            'level': self.level,
+            'description': self.description
+        }
+    
+    def __repr__(self):
+        return f'<ReportSeverity {self.level}>'
+
+
 # LOCATION MODEL
 
 class Location(db.Model):

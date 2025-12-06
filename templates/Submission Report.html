@@ -104,11 +104,9 @@
           </label>
           <select id="category" name="category" required class="form-field">
             <option value="">Select Environmental Category</option>
-            <option value="pollution">Pollution</option>
-            <option value="deforestation">Deforestation</option>
-            <option value="waste">Waste Dumping</option>
-            <option value="wildlife">Wildlife Incident</option>
-            <option value="other">Other</option>
+            {% for cat in categories %}
+            <option value="{{ cat.name.lower().replace(' ', '_') }}">{{ cat.name }}</option>
+            {% endfor %}
           </select>
         </div>
 
@@ -138,10 +136,9 @@
           </label>
           <select id="severity" name="severity" required class="form-field">
             <option value="">Select Impact Severity</option>
-            <option value="low">Low Impact</option>
-            <option value="medium">Medium Impact</option>
-            <option value="high">High Impact</option>
-            <option value="critical">Critical</option>
+            {% for sev in severity %}
+            <option value="{{ sev.level.lower() }}">{{ sev.level }} Impact</option>
+            {% endfor %}
           </select>
         </div>
 
