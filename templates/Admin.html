@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}EcoTrack - Admin Dashboard{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <header class="admin-header">
+        <h1>EcoTrack Admin - Reports Management</h1>
+        <div class="header-right">
+            <span>Welcome, {{ session.get('username', 'Admin') }}</span>
+            <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+        </div>
+    </header>
+
+    <main class="admin-main">
+        <h2>Environmental Reports Management</h2>
+        <p>Review, edit, and manage user-submitted environmental reports</p>
+
+        <div class="summary">
+            <div class="summary-card">
+                <h3>Total Reports</h3>
+                <p class="summary-number" id="total-reports">0</p>
+            </div>
+            <div class="summary-card">
+                <h3>Pending Review</h3>
+                <p class="summary-number" id="pending-reports">0</p>
+            </div>
+            <div class="summary-card">
+                <h3>Approved</h3>
+                <p class="summary-number" id="approved-reports">0</p>
+            </div>
+        </div>
+
+        <section class="reports-section">
+            <h3>User Reports</h3>
+            <table class="reports-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Type</th>
+                        <th>Severity</th>
+                        <th>Status</th>
+                        <th>Reporter</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="reports-tbody">
+                    <tr>
+                        <td colspan="7" style="text-align: center;">No reports submitted yet</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <div class="save-container">
+            <button id="save-btn" class="save-button" onclick="saveAllChanges()">Save All Changes</button>
+        </div>
+    </main>
+
+    <!-- Report Detail Modal -->
+    <div id="report-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Report Details</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p><strong>ID:</strong> <span id="modal-id"></span></p>
+                <p><strong>Title:</strong> <span id="modal-title"></span></p>
+                <p><strong>Description:</strong> <span id="modal-description"></span></p>
+                <p><strong>Type:</strong> <span id="modal-type"></span></p>
+                <p><strong>Severity:</strong> <span id="modal-severity"></span></p>
+                <p><strong>Reporter Name:</strong> <span id="modal-reporter-name"></span></p>
+                <p><strong>Reporter Contact:</strong> <span id="modal-reporter-contact"></span></p>
+                <p><strong>Status:</strong> <span id="modal-status" class="status-badge"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="confirmStatusChange()">Confirm Change</button>
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}

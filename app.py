@@ -1,8 +1,9 @@
 
 
-from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
+from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session
 from flask_cors import CORS
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
+import datetime as datetime_module
 
 # Import database configuration
 from database import init_db, create_tables, db
@@ -32,8 +33,11 @@ init_db(app)
 
 @app.route('/')
 def index():
-    """Homepage"""
-    return render_template('FP.html')
+    """Homepage - show FP if authenticated, otherwise show login"""
+    if 'user_id' in session:
+        return render_template('FP.html')
+    else:
+        return render_template('Login.html')
 
 @app.route('/api/species', methods=['GET'])
 def get_species():
@@ -525,6 +529,411 @@ def submission_report_view():
     categories = ReportCategory.query.all()
     severity = ReportSeverity.query.all()
     return render_template('Submission Report.html', locations=locations, categories=categories, severity=severity)
+
+
+# AUTHENTICATION ROUTES
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    """Display login page or handle login form submission"""
+    if request.method == 'GET':
+        return render_template('Login.html')
+    
+    # POST requests are handled by specific routes below
+    return redirect(url_for('login'))
+
+
+@app.route('/user_login', methods=['POST'])
+def user_login():
+    """Handle user login via username"""
+    try:
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '').strip()
+        
+        # Validation
+        if not username or not password:
+            flash('Username and password are required', 'user_error')
+            return render_template('Login.html')
+        
+        # Find user by username
+        user = User.query.filter_by(username=username).first()
+        
+        if not user or not user.check_password(password):
+            flash('Invalid username or password', 'user_error')
+            return render_template('Login.html')
+        
+        if not user.is_active:
+            flash('Your account has been deactivated', 'user_error')
+            return render_template('Login.html')
+        
+        # Create session
+        session['user_id'] = user.user_id
+        session['username'] = user.username
+        session['user_role'] = user.user_role
+        session['email'] = user.email
+        
+        try:
+            # Update last login
+            user.last_login = datetime.now()
+            db.session.commit()
+            
+            # Log activity
+            activity = ActivityLog(
+                user_id=user.user_id,
+                action_type='User Login',
+                description=f'User {user.username} logged in',
+                created_at=datetime.now()
+            )
+            db.session.add(activity)
+            db.session.commit()
+        except Exception as log_error:
+            app.logger.warning(f"Could not log activity: {str(log_error)}")
+            # Continue anyway, don't block login
+        
+        flash(f'Welcome back, {user.full_name}!', 'register_success')
+        return redirect(url_for('index'))
+        
+    except Exception as e:
+        app.logger.error(f"Login error: {str(e)}", exc_info=True)
+        flash('An error occurred during login', 'user_error')
+        return render_template('Login.html')
+
+
+@app.route('/user_register', methods=['POST'])
+def user_register():
+    """Handle user registration"""
+    try:
+        full_name = request.form.get('full_name', '').strip()
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '').strip()
+        confirm_password = request.form.get('confirm_password', '').strip()
+        
+        # Validation
+        errors = []
+        
+        if not all([full_name, username, password, confirm_password]):
+            errors.append('All fields are required')
+        
+        if len(username) < 3:
+            errors.append('Username must be at least 3 characters')
+        
+        if len(password) < 6:
+            errors.append('Password must be at least 6 characters')
+        
+        if password != confirm_password:
+            errors.append('Passwords do not match')
+        
+        # Check for existing user
+        if User.query.filter_by(username=username).first():
+            errors.append('Username already taken')
+        
+        if errors:
+            return jsonify({
+                'success': False,
+                'errors': errors
+            }), 400
+        
+        # Create new user with auto-generated email based on username
+        new_user = User(
+            username=username,
+            email=f'{username}@ecotrack.local',
+            full_name=full_name,
+            user_role='public',  # Default role for new users
+            is_active=True
+        )
+        new_user.set_password(password)
+        
+        db.session.add(new_user)
+        db.session.commit()
+        
+        # Log activity
+        activity = ActivityLog(
+            user_id=new_user.user_id,
+            action_type='User Registration',
+            description=f'New user {username} registered',
+            created_at=datetime.now()
+        )
+        db.session.add(activity)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Account created successfully! You can now log in.'
+        }), 201
+        
+    except Exception as e:
+        app.logger.error(f"Registration error: {str(e)}")
+        return jsonify({
+            'success': False,
+            'errors': ['An error occurred during registration']
+        }), 500
+
+
+@app.route('/admin_login', methods=['POST'])
+def admin_login():
+    """Handle admin login"""
+    try:
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '').strip()
+        remember = request.form.get('remember') == 'on'
+        
+        # Validation
+        if not username or not password:
+            flash('Username and password are required', 'admin_error')
+            return render_template('Login.html')
+        
+        # Find user by username
+        user = User.query.filter_by(username=username).first()
+        
+        if not user or not user.check_password(password):
+            flash('Invalid username or password', 'admin_error')
+            return render_template('Login.html')
+        
+        # Check if user is admin
+        if user.user_role != 'admin':
+            flash('You do not have admin privileges', 'admin_error')
+            
+            # Log failed admin login attempt
+            activity = ActivityLog(
+                user_id=user.user_id,
+                action_type='Failed Admin Login',
+                description=f'Non-admin user {username} attempted admin login',
+                created_at=datetime.now()
+            )
+            db.session.add(activity)
+            db.session.commit()
+            
+            return render_template('Login.html')
+        
+        if not user.is_active:
+            flash('Your account has been deactivated', 'admin_error')
+            return render_template('Login.html')
+        
+        # Create admin session
+        session['user_id'] = user.user_id
+        session['username'] = user.username
+        session['user_role'] = user.user_role
+        session['email'] = user.email
+        session['is_admin'] = True
+        
+        if remember:
+            session.permanent = True
+            app.permanent_session_lifetime = timedelta(days=7)
+        
+        # Update last login
+        user.last_login = datetime.now()
+        db.session.commit()
+        
+        # Log admin login
+        activity = ActivityLog(
+            user_id=user.user_id,
+            action_type='Admin Login',
+            description=f'Admin {username} logged in',
+            created_at=datetime.now()
+        )
+        db.session.add(activity)
+        db.session.commit()
+        
+        flash(f'Welcome, Admin {user.full_name}!', 'register_success')
+        return redirect(url_for('admin_dashboard'))
+        
+    except Exception as e:
+        app.logger.error(f"Admin login error: {str(e)}")
+        flash('An error occurred during admin login', 'admin_error')
+        return render_template('Login.html')
+
+
+@app.route('/logout', methods=['GET', 'POST'])
+def logout():
+    """Handle user logout"""
+    try:
+        if 'user_id' in session:
+            user_id = session['user_id']
+            username = session.get('username', 'Unknown')
+            
+            # Log logout activity
+            activity = ActivityLog(
+                user_id=user_id,
+                action_type='User Logout',
+                description=f'User {username} logged out',
+                created_at=datetime.now()
+            )
+            db.session.add(activity)
+            db.session.commit()
+        
+        session.clear()
+        flash('You have been logged out', 'register_success')
+    except Exception as e:
+        app.logger.error(f"Logout error: {str(e)}")
+    
+    return redirect(url_for('index'))
+
+
+@app.route('/admin')
+def admin_dashboard():
+    """Admin dashboard - only accessible by admin users"""
+    # Check if user is logged in and is admin
+    if 'user_id' not in session:
+        flash('You must be logged in to access the admin panel', 'user_error')
+        return redirect(url_for('login'))
+    
+    if session.get('user_role') != 'admin':
+        flash('You do not have permission to access the admin panel', 'user_error')
+        return redirect(url_for('index'))
+    
+    return render_template('Admin.html')
+
+
+# API ROUTES FOR ADMIN DASHBOARD
+
+@app.route('/api/admin/reports', methods=['GET'])
+def get_admin_reports():
+    """Get all environmental reports for admin dashboard"""
+    if 'user_id' not in session or session.get('user_role') != 'admin':
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 403
+    
+    try:
+        reports = db.session.query(EnvironmentalReport).all()
+        
+        reports_data = []
+        for report in reports:
+            reports_data.append({
+                'report_id': report.report_id,
+                'title': report.title,
+                'description': report.description,
+                'report_type': report.report_type,
+                'severity': report.severity,
+                'reporter_name': report.reporter_name,
+                'reporter_contact': report.reporter_contact,
+                'status': report.status
+            })
+        
+        return jsonify({
+            'success': True,
+            'reports': reports_data,
+            'stats': {
+                'total': len(reports_data),
+                'pending': 0,
+                'approved': 0
+            }
+        })
+    except Exception as e:
+        app.logger.error(f"Error fetching reports: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@app.route('/api/admin/reports/<int:report_id>', methods=['GET'])
+def get_admin_report(report_id):
+    """Get a specific report for editing"""
+    if 'user_id' not in session or session.get('user_role') != 'admin':
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 403
+    
+    try:
+        report = db.session.query(EnvironmentalReport).filter_by(report_id=report_id).first()
+        
+        if not report:
+            return jsonify({'success': False, 'message': 'Report not found'}), 404
+        
+        return jsonify({
+            'success': True,
+            'report': {
+                'report_id': report.report_id,
+                'report_type': report.report_type,
+                'location': report.location,
+                'description': report.description,
+                'severity': report.severity,
+                'submitted_date': report.submitted_date.isoformat() if report.submitted_date else None,
+                'submitted_by': report.submitted_by or 'Anonymous'
+            }
+        })
+    except Exception as e:
+        app.logger.error(f"Error fetching report: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@app.route('/api/admin/reports/<int:report_id>', methods=['PUT'])
+def update_admin_report(report_id):
+    """Update a report"""
+    if 'user_id' not in session or session.get('user_role') != 'admin':
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 403
+    
+    try:
+        report = db.session.query(EnvironmentalReport).filter_by(report_id=report_id).first()
+        
+        if not report:
+            return jsonify({'success': False, 'message': 'Report not found'}), 404
+        
+        data = request.get_json()
+        
+        # Update fields from seed.py attributes
+        if 'title' in data:
+            report.title = data['title']
+        if 'description' in data:
+            report.description = data['description']
+        if 'report_type' in data:
+            report.report_type = data['report_type']
+        if 'severity' in data:
+            report.severity = data['severity']
+        if 'reporter_name' in data:
+            report.reporter_name = data['reporter_name']
+        if 'reporter_contact' in data:
+            report.reporter_contact = data['reporter_contact']
+        if 'status' in data:
+            report.status = data['status']
+        
+        db.session.commit()
+        
+        # Log activity
+        activity = ActivityLog(
+            user_id=session.get('user_id'),
+            action_type='edit_report',
+            description=f'Edited report #{report_id}',
+            created_at=datetime_module.datetime.now()
+        )
+        db.session.add(activity)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Report updated successfully'
+        })
+    except Exception as e:
+        app.logger.error(f"Error updating report: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@app.route('/api/admin/reports/<int:report_id>', methods=['DELETE'])
+def delete_admin_report(report_id):
+    """Delete a report"""
+    if 'user_id' not in session or session.get('user_role') != 'admin':
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 403
+    
+    try:
+        report = db.session.query(EnvironmentalReport).filter_by(report_id=report_id).first()
+        
+        if not report:
+            return jsonify({'success': False, 'message': 'Report not found'}), 404
+        
+        db.session.delete(report)
+        db.session.commit()
+        
+        # Log activity
+        activity = ActivityLog(
+            user_id=session.get('user_id'),
+            action_type='delete_report',
+            description=f'Deleted report #{report_id}',
+            created_at=datetime_module.datetime.now()
+        )
+        db.session.add(activity)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Report deleted successfully'
+        })
+    except Exception as e:
+        app.logger.error(f"Error deleting report: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 # ERROR HANDLERS
 

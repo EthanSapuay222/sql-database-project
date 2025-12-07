@@ -1,0 +1,78 @@
+/* Login Page Styles */
+
+.tab-button {
+    transition: all 0.3s ease;
+}
+
+.tab-button.active {
+    font-weight: 600;
+}
+
+.tab-content {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Form Styling */
+input[type="email"],
+input[type="password"],
+input[type="text"] {
+    transition: all 0.3s ease;
+}
+
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="text"]:focus {
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+}
+
+/* Button Hover Effects */
+button[type="submit"] {
+    transition: all 0.2s ease;
+}
+
+button[type="submit"]:active {
+    transform: scale(0.98);
+}
+
+/* Alert Messages */
+.alert-error {
+    animation: slideDown 0.3s ease-out;
+}
+
+.alert-success {
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+    .tab-button {
+        font-size: 0.875rem;
+    }
+
+    .px-6 {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}

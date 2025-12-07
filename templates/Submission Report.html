@@ -139,7 +139,7 @@
           <select id="location" name="location" required class="form-field">
             <option value="">Select a Location</option>
             {% for location in locations %}
-            <option value="{{ location.location_id }}">{{ location.city_name }} ({{ location.location_type.capitalize() }})</option>
+            <option value="{{ location.city_name }}">{{ location.city_name }} ({{ location.location_type.capitalize() }})</option>
             {% endfor %}
           </select>
         </div>
