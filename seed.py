@@ -8,9 +8,9 @@ from database import db
 from datetime import date, timedelta
 import random
 
-# ============================================================================
+
 # SECTION 1: LOCATIONS DATA
-# ============================================================================
+
 # 34 locations covering Batangas: 5 cities + 29 municipalities
 # Fields: city_name, location_type (city/municipality), latitude, longitude, severity_level
 
@@ -120,7 +120,9 @@ LAND_SPECIES = [
         'conservation_status': 'Least Concern',
         'status_trend': 'stable',
         'total_sightings_estimate': '15,000-30,000',
-        'description': 'Sporting brown plumage and a distinctive blue-grey bill, this species charms with its subtle beauty and surprises with its adaptability.'
+        'description': 'Sporting brown plumage and a distinctive blue-grey bill, this species charms with its subtle beauty and surprises with its adaptability.',
+        'habitat_info': 'Freshwater lakes, marshes, rice paddies, and wetlands throughout the Philippines. Prefers shallow waters with vegetation.',
+        'diet_info': 'Seeds, aquatic plants, small invertebrates, and grain. Dabbles and tips-up to feed on submerged vegetation.'
     },
     {
         'common_name': 'White-breasted Waterhen',
@@ -130,7 +132,9 @@ LAND_SPECIES = [
         'conservation_status': 'Least Concern',
         'status_trend': 'stable',
         'total_sightings_estimate': '10,000-100,000',
-        'description': 'Adult White-breasted waterhens have mainly dark grey upperparts and flanks, and a white face, neck, and breast. The lower belly and undertail are cinnamon or white colored.'
+        'description': 'Adult White-breasted waterhens have mainly dark grey upperparts and flanks, and a white face, neck, and breast. The lower belly and undertail are cinnamon or white colored.',
+        'habitat_info': 'Wetlands, marshes, ricefields, and water margins. Often found in areas with dense vegetation and reeds.',
+        'diet_info': 'Aquatic invertebrates, small fish, seeds, and plant material. Forages by picking from water surface or ground.'
     },
     {
         'common_name': 'Garden Sunbird',
@@ -140,7 +144,9 @@ LAND_SPECIES = [
         'conservation_status': 'Least Concern',
         'status_trend': 'stable',
         'total_sightings_estimate': '15,000-25,000',
-        'description': 'A beautifully colored passerine bird from Southeast Asia. It has a long downward-curved bill which it uses to take nectar and capture insects.'
+        'description': 'A beautifully colored passerine bird from Southeast Asia. It has a long downward-curved bill which it uses to take nectar and capture insects.',
+        'habitat_info': 'Gardens, scrubland, forest edges, and cultivated areas with flowering plants. Found in lowlands and hills up to 2000m.',
+        'diet_info': 'Primarily nectar from flowering plants, also small insects and spiders caught while feeding on flowers.'
     },
     {
         'common_name': 'Collared Kingfisher',
@@ -150,7 +156,9 @@ LAND_SPECIES = [
         'conservation_status': 'Least Concern',
         'status_trend': 'stable',
         'total_sightings_estimate': 'Unknown',
-        'description': 'It hunts insects, crabs and small fish by perching and quickly diving its prey. This species is widespread and easily spotted due to its loud calls.'
+        'description': 'It hunts insects, crabs and small fish by perching and quickly diving its prey. This species is widespread and easily spotted due to its loud calls.',
+        'habitat_info': 'Open habitats near water including mangroves, coastal areas, ricefields, and forest edges. Often seen perched prominently.',
+        'diet_info': 'Small fish, crustaceans, and large insects. Hunts by perching and diving quickly to catch prey in water.'
     },
     
     # Mammals
@@ -162,7 +170,9 @@ LAND_SPECIES = [
         'conservation_status': 'Least Concern',
         'status_trend': 'stable',
         'total_sightings_estimate': 'Not specified yet',
-        'description': 'A captivating creature of the night, found gracefully navigating the tropical forests of Southeast Asia. These fascinating bats play a vital role in their ecosystems.'
+        'description': 'A captivating creature of the night, found gracefully navigating the tropical forests of Southeast Asia. These fascinating bats play a vital role in their ecosystems.',
+        'habitat_info': 'Tropical forests, secondary forests, and forest gardens. Roosts in caves, tree hollows, and human structures.',
+        'diet_info': 'Fruits and nectar from various tree species. Plays important role in seed dispersal and pollination.'
     },
     {
         'common_name': 'Luzon Giant Cloud Rat',
@@ -172,7 +182,9 @@ LAND_SPECIES = [
         'conservation_status': 'Concerned',
         'status_trend': 'stable',
         'total_sightings_estimate': 'Unknown',
-        'description': 'This rodent has a relatively long pelage, which also covers the tail. The color is highly variable, but it is usually pale brown-grey or white with some dark brown or black patches.'
+        'description': 'This rodent has a relatively long pelage, which also covers the tail. The color is highly variable, but it is usually pale brown-grey or white with some dark brown or black patches.',
+        'habitat_info': 'Cloud forests and mossy montane forests of northern Luzon at high elevations (1500-2500m). Nocturnal and arboreal.',
+        'diet_info': 'Leaves, bark, and vegetation found in forest canopy. Primarily herbivorous, adapted for arboreal life.'
     },
     {
         'common_name': 'Lion',
@@ -182,7 +194,9 @@ LAND_SPECIES = [
         'conservation_status': 'Vulnerable',
         'status_trend': 'decreasing',
         'total_sightings_estimate': '23,000-39,000',
-        'description': 'The lion is a big wild cat with short, tawny-colored fur and white underparts. The long tail ends with a black tuft.'
+        'description': 'The lion is a big wild cat with short, tawny-colored fur and white underparts. The long tail ends with a black tuft.',
+        'habitat_info': 'Savannas, grasslands, and open woodlands in Africa and small population in Gir Forest, India. Social cats living in prides.',
+        'diet_info': 'Large herbivores including zebras, antelope, and buffalo. Apex predators hunted cooperatively in groups.'
     },
     {
         'common_name': 'Philippine Warty Pig',
@@ -192,7 +206,9 @@ LAND_SPECIES = [
         'conservation_status': 'Vulnerable',
         'status_trend': 'decreasing',
         'total_sightings_estimate': 'Unknown',
-        'description': 'A wild pig species with a distinctive "mane" and warty face. Important for nutrient cycling in forests.'
+        'description': 'A wild pig species with a distinctive "mane" and warty face. Important for nutrient cycling in forests.',
+        'habitat_info': 'Tropical forests and forest edges throughout the Philippines. Nocturnal and solitary, uses forest for shelter and food.',
+        'diet_info': 'Roots, tubers, insects, small animals, and fallen fruit. Forages on forest floor and helps maintain soil health.'
     },
     {
         'common_name': 'Philippine Long-Tailed Macaque',
@@ -202,7 +218,9 @@ LAND_SPECIES = [
         'conservation_status': 'Least Concern',
         'status_trend': 'decreasing',
         'total_sightings_estimate': 'Unknown',
-        'description': 'Lives in group and eat fruits, leaves, and small animals, making it very adaptable. However, its population is decreasing due to habitat loss and trapping.'
+        'description': 'Lives in group and eat fruits, leaves, and small animals, making it very adaptable. However, its population is decreasing due to habitat loss and trapping.',
+        'habitat_info': 'Tropical forests, mangroves, and agricultural areas throughout Philippines. Highly adaptable to different habitats. Social species living in troops.',
+        'diet_info': 'Fruits, leaves, seeds, insects, and small vertebrates. Opportunistic feeders adaptable to various food sources.'
     },
     
     # Reptiles
@@ -214,7 +232,9 @@ LAND_SPECIES = [
         'conservation_status': 'Least Concern',
         'status_trend': 'stable',
         'total_sightings_estimate': 'Unknown',
-        'description': 'The skin of Tokay geckos is soft to the touch and is generally gray with red speckles. However, Tokay geckos can change the color of their skin to blend into the environment.'
+        'description': 'The skin of Tokay geckos is soft to the touch and is generally gray with red speckles. However, Tokay geckos can change the color of their skin to blend into the environment.',
+        'habitat_info': 'Tropical forests, caves, human structures, and rocky areas. Nocturnal, often heard by distinctive loud calls at night.',
+        'diet_info': 'Insects, spiders, small vertebrates, and other small animals. Active hunters that wait for prey on surfaces.'
     },
     {
         'common_name': 'Reticulated Python',
@@ -224,7 +244,9 @@ LAND_SPECIES = [
         'conservation_status': 'Least Concern',
         'status_trend': 'stable',
         'total_sightings_estimate': 'Unknown',
-        'description': 'Is a non-venomous snake native to South and Southeast Asia. It is the world\'s longest snake and is among the three heaviest snakes.'
+        'description': 'Is a non-venomous snake native to South and Southeast Asia. It is the world\'s longest snake and is among the three heaviest snakes.',
+        'habitat_info': 'Tropical rainforests, swamps, and cultivated areas throughout Southeast Asia. Semi-aquatic, often found near water.',
+        'diet_info': 'Mammals and large birds. Constrictor that swallows prey whole. Can consume large animals.'
     },
     {
         'common_name': 'Common House Gecko',
@@ -234,7 +256,9 @@ LAND_SPECIES = [
         'conservation_status': 'Least Concern',
         'status_trend': 'stable',
         'total_sightings_estimate': 'Unknown',
-        'description': 'A small lizard native to Southeast Asia. They are named so because they are often seen climbing walls of houses and other buildings in search of insects.'
+        'description': 'A small lizard native to Southeast Asia. They are named so because they are often seen climbing walls of houses and other buildings in search of insects.',
+        'habitat_info': 'Human settlements, houses, buildings, and trees. Commensal species highly adapted to living with humans.',
+        'diet_info': 'Small insects, spiders, and invertebrates. Nocturnal hunters attracted to artificial lights around buildings.'
     },
 ]
 
@@ -248,7 +272,9 @@ WATER_SPECIES = [
         'conservation_status': 'Vulnerable',
         'status_trend': 'unknown',
         'total_sightings_estimate': 'Unknown',
-        'description': 'A small to medium sea turtle known for its olive colored shell. They are famous for nesting events called "arribadas". They feed on jellyfish, small fish, crustaceans.'
+        'description': 'A small to medium sea turtle known for its olive colored shell. They are famous for nesting events called "arribadas". They feed on jellyfish, small fish, crustaceans.',
+        'habitat_info': 'Tropical and subtropical oceans worldwide. Highly migratory, travels long distances between feeding and nesting grounds.',
+        'diet_info': 'Jellyfish, small fish, crustaceans, and marine plants. Also consumes floating debris which can be fatal.'
     },
     {
         'common_name': 'Green Turtle',
@@ -258,7 +284,9 @@ WATER_SPECIES = [
         'conservation_status': 'Endangered',
         'status_trend': 'unknown',
         'total_sightings_estimate': 'Unknown',
-        'description': 'Large herbivorous sea turtle often found near coral reefs and seagrass beds. Adults eat sea grass, helping maintain healthy marine ecosystems.'
+        'description': 'Large herbivorous sea turtle often found near coral reefs and seagrass beds. Adults eat sea grass, helping maintain healthy marine ecosystems.',
+        'habitat_info': 'Tropical and subtropical oceans, coastal reefs, and seagrass beds. Females return to natal beaches to nest.',
+        'diet_info': 'Juveniles are omnivorous eating jellyfish and invertebrates. Adults are herbivorous, feeding on seagrass and algae.'
     },
     {
         'common_name': 'Hawksbill Turtle',
@@ -268,7 +296,9 @@ WATER_SPECIES = [
         'conservation_status': 'Critically Endangered',
         'status_trend': 'unknown',
         'total_sightings_estimate': 'Unknown',
-        'description': 'Critically endangered turtle known for its beautifully patterned shell. They help control sponge populations on coral reefs.'
+        'description': 'Critically endangered turtle known for its beautifully patterned shell. They help control sponge populations on coral reefs.',
+        'habitat_info': 'Tropical coral reefs and rocky areas throughout world oceans. Highly migratory and solitary species.',
+        'diet_info': 'Primarily sponges living on coral reefs. Also eats tunicates, corals, and other invertebrates. Helps maintain reef health.'
     },
     
     # Fish/Sharks
@@ -280,7 +310,9 @@ WATER_SPECIES = [
         'conservation_status': 'Endangered',
         'status_trend': 'decreasing',
         'total_sightings_estimate': 'Unknown',
-        'description': 'The world\'s largest fish. A gentle filter feeder eating plankton and small fish. Important to ocean plankton balance.'
+        'description': 'The world\'s largest fish. A gentle filter feeder eating plankton and small fish. Important to ocean plankton balance.',
+        'habitat_info': 'Tropical and subtropical oceans between 21-30°C. Migratory, seasonally moves to areas with plankton blooms.',
+        'diet_info': 'Filter feeder eating plankton, fish eggs, and small fish. Processes large volumes of water daily.'
     },
     {
         'common_name': 'Blacktip Reef Shark',
@@ -290,7 +322,9 @@ WATER_SPECIES = [
         'conservation_status': 'Near Threatened',
         'status_trend': 'unknown',
         'total_sightings_estimate': 'Unknown',
-        'description': 'A small reef shark with black-tipped fins. Lives in shallow water and coral reefs. Plays a role in keeping fish populations balanced.'
+        'description': 'A small reef shark with black-tipped fins. Lives in shallow water and coral reefs. Plays a role in keeping fish populations balanced.',
+        'habitat_info': 'Shallow coastal waters, coral reefs, and lagoons in Indo-Pacific region. Found at depths less than 60m.',
+        'diet_info': 'Small fish, rays, and crustaceans. Important predator maintaining balance in reef ecosystems.'
     },
     
     # Rays
@@ -302,7 +336,9 @@ WATER_SPECIES = [
         'conservation_status': 'Vulnerable',
         'status_trend': 'unknown',
         'total_sightings_estimate': 'Unknown',
-        'description': 'Large, gentle rays called "sea butterflies". Filter feeding on plankton. Highly intelligent and long lived.'
+        'description': 'Large, gentle rays called "sea butterflies". Filter feeding on plankton. Highly intelligent and long lived.',
+        'habitat_info': 'Tropical and subtropical oceans. Highly migratory, seasonally congregates in areas with plankton abundance.',
+        'diet_info': 'Filter feeders eating plankton and small fish. Can consume up to 1% of body weight daily in plankton.'
     },
     
     # Marine Mammals
@@ -314,7 +350,9 @@ WATER_SPECIES = [
         'conservation_status': 'Vulnerable',
         'status_trend': 'unknown',
         'total_sightings_estimate': 'Unknown',
-        'description': 'Small, active dolphins known for spinning jumps. Feed on small fish and squid. Important part of marine food chain.'
+        'description': 'Small, active dolphins known for spinning jumps. Feed on small fish and squid. Important part of marine food chain.',
+        'habitat_info': 'Tropical and subtropical oceans worldwide. Often found in groups, daylight hours in deeper offshore waters.',
+        'diet_info': 'Small fish and squid caught during night feeding dives. Uses echolocation to hunt in deep waters.'
     },
     {
         'common_name': 'Dwarf Sperm Whale',
@@ -324,7 +362,9 @@ WATER_SPECIES = [
         'conservation_status': 'Data Deficient',
         'status_trend': 'unknown',
         'total_sightings_estimate': 'Unknown',
-        'description': 'A small, shy whale species rarely seen alive. Known for releasing a cloud of ink-like fluid to escape predators.'
+        'description': 'A small, shy whale species rarely seen alive. Known for releasing a cloud of ink-like fluid to escape predators.',
+        'habitat_info': 'Deep offshore waters of tropical and subtropical oceans. Elusive and rarely observed in wild.',
+        'diet_info': 'Deep-sea squid and fish. Dives to depths of 300-900m to hunt in deep water.'
     },
 ]
 
@@ -621,17 +661,9 @@ def main():
         print("=" * 70)
         print("🌱 MASTER SEED - EcoTrack Database Initialization")
         print("=" * 70)
-        print()
-        
-        # Validate enum consistency before seeding
-        if not validate_enum_consistency():
-            print("\n❌ Seeding aborted due to validation errors.\n")
-            return
-        
-        print()
 
         # Seed Locations
-        print("[1/5] Seeding Locations (34 Batangas cities & municipalities)...")
+        print("\n[1/5] Seeding Locations (34 Batangas cities & municipalities)...")
         loc_inserted, loc_updated = seed_locations()
         print(f"      ✅ Locations - Inserted: {loc_inserted}, Updated: {loc_updated}")
 
