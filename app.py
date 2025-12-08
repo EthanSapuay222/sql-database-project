@@ -558,7 +558,7 @@ def user_login():
         # Find user by username
         user = User.query.filter_by(username=username).first()
         
-        if not user or not user.check_password(password):
+        if not user or user.password != password:
             flash('Invalid username or password', 'user_error')
             return render_template('Login.html')
         
@@ -570,7 +570,6 @@ def user_login():
         session['user_id'] = user.user_id
         session['username'] = user.username
         session['user_role'] = user.user_role
-        session['email'] = user.email
         
         try:
             # Update last login
@@ -633,15 +632,14 @@ def user_register():
                 'errors': errors
             }), 400
         
-        # Create new user with auto-generated email based on username
+        # Create new user
         new_user = User(
             username=username,
-            email=f'{username}@ecotrack.local',
+            password=password,
             full_name=full_name,
             user_role='public',  # Default role for new users
             is_active=True
         )
-        new_user.set_password(password)
         
         db.session.add(new_user)
         db.session.commit()
@@ -685,7 +683,7 @@ def admin_login():
         # Find user by username
         user = User.query.filter_by(username=username).first()
         
-        if not user or not user.check_password(password):
+        if not user or user.password != password:
             flash('Invalid username or password', 'admin_error')
             return render_template('Login.html')
         
@@ -713,7 +711,6 @@ def admin_login():
         session['user_id'] = user.user_id
         session['username'] = user.username
         session['user_role'] = user.user_role
-        session['email'] = user.email
         session['is_admin'] = True
         
         if remember:
@@ -935,7 +932,70 @@ def delete_admin_report(report_id):
         app.logger.error(f"Error deleting report: {str(e)}")
         return jsonify({'success': False, 'message': str(e)}), 500
 
-# ERROR HANDLERS
+
+
+# USER MANAGEMENT API ROUTES
+
+@app.route('/api/admin/users', methods=['GET'])
+def get_admin_users():
+    """Get all users for admin dashboard"""
+    if 'user_id' not in session or session.get('user_role') != 'admin':
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 403
+    
+    try:
+        users = db.session.query(User).all()
+        users_data = [user.to_dict() for user in users]
+        return jsonify({
+            'success': True,
+            'users': users_data
+        })
+    except Exception as e:
+        app.logger.error(f"Error fetching users: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@app.route('/api/admin/users/<int:user_id>', methods=['DELETE'])
+def delete_admin_user(user_id):
+    """Delete a user - admin only"""
+    if 'user_id' not in session or session.get('user_role') != 'admin':
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 403
+    
+    try:
+        # Prevent admin from deleting themselves
+        if user_id == session.get('user_id'):
+            return jsonify({'success': False, 'message': 'Cannot delete your own account'}), 400
+        
+        user = db.session.query(User).filter_by(user_id=user_id).first()
+        
+        if not user:
+            return jsonify({'success': False, 'message': 'User not found'}), 404
+        
+        # Prevent deleting other admin accounts
+        if user.user_role == 'admin':
+            return jsonify({'success': False, 'message': 'Cannot delete admin accounts'}), 400
+        
+        username = user.username
+        db.session.delete(user)
+        db.session.commit()
+        
+        # Log activity
+        activity = ActivityLog(
+            user_id=session.get('user_id'),
+            action_type='delete_user',
+            description=f'Deleted user: {username}',
+            created_at=datetime_module.datetime.now()
+        )
+        db.session.add(activity)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': f'User {username} deleted successfully'
+        })
+    except Exception as e:
+        app.logger.error(f"Error deleting user: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)}), 500
+
 
 @app.errorhandler(404)
 def not_found(error):
@@ -953,12 +1013,12 @@ def internal_error(error):
         'message': 'Internal server error'
     }), 500
 
-# RUN APPLICATION
+
 
 if __name__ == '__main__':
-    # Create tables if they don't exist
+
     with app.app_context():
         create_tables(app)
     
-    # Run the application
+
     app.run(debug=True, host='0.0.0.0', port=5000)

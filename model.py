@@ -1,6 +1,5 @@
 from database import db  # Import db from database.py
 from datetime import datetime
-from werkzeug.security import generate_password_hash, check_password_hash
 
 
 
@@ -20,6 +19,7 @@ class Species(db.Model):
     description = db.Column(db.Text)
     habitat_info = db.Column(db.Text)
     diet_info = db.Column(db.Text)
+    photo_url = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
@@ -38,7 +38,8 @@ class Species(db.Model):
             'total_sightings_estimate': self.total_sightings_estimate,
             'description': self.description,
             'habitat_info': self.habitat_info,
-            'diet_info': self.diet_info
+            'diet_info': self.diet_info,
+            'photo_url': self.photo_url
         }
     
     def __repr__(self):
@@ -205,27 +206,17 @@ class User(db.Model):
     
     user_id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
-    password_hash = db.Column(db.String(255), nullable=False)
+    password = db.Column(db.String(255), nullable=False)
     full_name = db.Column(db.String(100))
-    user_role = db.Column(db.Enum('admin', 'moderator', 'observer', 'public'), default='public')
+    user_role = db.Column(db.Enum('admin', 'public'), default='public')
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_login = db.Column(db.DateTime)
-    
-    def set_password(self, password):
-        """Hash and set user password"""
-        self.password_hash = generate_password_hash(password)
-    
-    def check_password(self, password):
-        """Check if provided password matches hash"""
-        return check_password_hash(self.password_hash, password)
     
     def to_dict(self):
         return {
             'user_id': self.user_id,
             'username': self.username,
-            'email': self.email,
             'full_name': self.full_name,
             'user_role': self.user_role,
             'is_active': self.is_active,

@@ -1,145 +1,94 @@
--- ============================================================================
--- EcoTrack Database Schema - PostgreSQL Version
--- ============================================================================
--- Project: EcoTrack Environmental Monitoring System
--- Database: PostgreSQL
--- Version: 1.0
--- Created: December 2025
--- ============================================================================
+DROP TABLE IF EXISTS activity_log;
+DROP TABLE IF EXISTS dashboard_stats;
+DROP TABLE IF EXISTS sightings;
+DROP TABLE IF EXISTS environmental_reports;
+DROP TABLE IF EXISTS species;
+DROP TABLE IF EXISTS locations;
+DROP TABLE IF EXISTS report_categories;
+DROP TABLE IF EXISTS report_severity;
+DROP TABLE IF EXISTS users;
 
--- ============================================================================
--- DROP EXISTING OBJECTS (for clean reinstall)
--- ============================================================================
-DROP TABLE IF EXISTS activity_log CASCADE;
-DROP TABLE IF EXISTS dashboard_stats CASCADE;
-DROP TABLE IF EXISTS sightings CASCADE;
-DROP TABLE IF EXISTS environmental_reports CASCADE;
-DROP TABLE IF EXISTS species CASCADE;
-DROP TABLE IF EXISTS locations CASCADE;
-DROP TABLE IF EXISTS report_categories CASCADE;
-DROP TABLE IF EXISTS report_severity CASCADE;
-DROP TABLE IF EXISTS users CASCADE;
-
-DROP TYPE IF EXISTS category_type CASCADE;
-DROP TYPE IF EXISTS status_trend_type CASCADE;
-DROP TYPE IF EXISTS location_type_enum CASCADE;
-DROP TYPE IF EXISTS severity_type CASCADE;
-DROP TYPE IF EXISTS verification_type CASCADE;
-DROP TYPE IF EXISTS report_type_enum CASCADE;
-DROP TYPE IF EXISTS report_status_type CASCADE;
-DROP TYPE IF EXISTS user_role_type CASCADE;
-
--- ============================================================================
--- CREATE ENUM TYPES
--- ============================================================================
-CREATE TYPE category_type AS ENUM ('land', 'water');
-CREATE TYPE status_trend_type AS ENUM ('stable', 'increasing', 'decreasing', 'unknown');
-CREATE TYPE location_type_enum AS ENUM ('city', 'municipality');
-CREATE TYPE severity_type AS ENUM ('Critical', 'High', 'Medium', 'Low');
-CREATE TYPE verification_type AS ENUM ('pending', 'verified', 'rejected');
-CREATE TYPE report_type_enum AS ENUM ('pollution', 'deforestation', 'waste_dumping', 'wildlife_incident', 'other');
-CREATE TYPE report_status_type AS ENUM ('pending', 'in_progress', 'completed', 'closed');
-CREATE TYPE user_role_type AS ENUM ('admin', 'public');
-
--- ============================================================================
 -- TABLE 1: SPECIES
--- Description: Stores information about wildlife species (land and water)
--- ============================================================================
 CREATE TABLE species (
-    species_id SERIAL PRIMARY KEY,
+    species_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     common_name VARCHAR(100) NOT NULL,
     scientific_name VARCHAR(150) NOT NULL,
-    category category_type NOT NULL,
+    category VARCHAR(5) NOT NULL CHECK (category IN ('land', 'water')),
     species_type VARCHAR(50),
     conservation_status VARCHAR(50),
-    status_trend status_trend_type,
+    status_trend VARCHAR(10) CHECK (status_trend IN ('stable', 'increasing', 'decreasing', 'unknown')),
     total_sightings_estimate VARCHAR(50),
     description TEXT,
     habitat_info TEXT,
     diet_info TEXT,
     photo_url VARCHAR(255),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX idx_species_category ON species(category);
 CREATE INDEX idx_species_type ON species(species_type);
 CREATE INDEX idx_conservation_status ON species(conservation_status);
 
--- ============================================================================
 -- TABLE 2: LOCATIONS
--- Description: Geographic locations (cities and municipalities in Batangas)
--- ============================================================================
 CREATE TABLE locations (
-    location_id SERIAL PRIMARY KEY,
+    location_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     city_name VARCHAR(100) NOT NULL,
-    location_type location_type_enum NOT NULL,
-    latitude DECIMAL(10,7) NOT NULL,
-    longitude DECIMAL(10,7) NOT NULL,
-    severity_level severity_type NOT NULL,
-    total_reports INT DEFAULT 0,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    location_type VARCHAR(12) NOT NULL CHECK (location_type IN ('city', 'municipality')),
+    latitude NUMERIC(10, 7) NOT NULL,
+    longitude NUMERIC(10, 7) NOT NULL,
+    severity_level VARCHAR(8) NOT NULL CHECK (severity_level IN ('Critical', 'High', 'Medium', 'Low')),
+    total_reports INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX idx_locations_severity ON locations(severity_level);
 CREATE INDEX idx_locations_coordinates ON locations(latitude, longitude);
 
--- ============================================================================
 -- TABLE 3: SIGHTINGS
--- Description: Wildlife observation records linking species to locations
--- ============================================================================
 CREATE TABLE sightings (
-    sighting_id SERIAL PRIMARY KEY,
-    species_id INT NOT NULL,
-    location_id INT NOT NULL,
+    sighting_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    species_id INTEGER NOT NULL,
+    location_id INTEGER NOT NULL,
     sighting_date DATE NOT NULL,
-    number_observed INT DEFAULT 1,
+    number_observed INTEGER DEFAULT 1,
     observer_name VARCHAR(100),
     observer_contact VARCHAR(100),
-    verification_status verification_type DEFAULT 'pending',
+    verification_status VARCHAR(8) DEFAULT 'pending' CHECK (verification_status IN ('pending', 'verified', 'rejected')),
     notes TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_sightings_species FOREIGN KEY (species_id) REFERENCES species(species_id) ON DELETE CASCADE,
-    CONSTRAINT fk_sightings_location FOREIGN KEY (location_id) REFERENCES locations(location_id) ON DELETE CASCADE
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (species_id) REFERENCES species(species_id) ON DELETE CASCADE,
+    FOREIGN KEY (location_id) REFERENCES locations(location_id) ON DELETE CASCADE
 );
 
 CREATE INDEX idx_sightings_date ON sightings(sighting_date);
 CREATE INDEX idx_sightings_species ON sightings(species_id);
 CREATE INDEX idx_sightings_location ON sightings(location_id);
 
--- ============================================================================
 -- TABLE 4: REPORT_CATEGORIES
--- Description: Categories for environmental reports
--- ============================================================================
 CREATE TABLE report_categories (
-    category_id SERIAL PRIMARY KEY,
-    name VARCHAR(100) UNIQUE NOT NULL,
+    category_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR(100) NOT NULL UNIQUE,
     description TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- ============================================================================
 -- TABLE 5: REPORT_SEVERITY
--- Description: Severity levels for environmental reports
--- ============================================================================
 CREATE TABLE report_severity (
-    severity_id SERIAL PRIMARY KEY,
-    level VARCHAR(50) UNIQUE NOT NULL,
+    severity_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    level VARCHAR(50) NOT NULL UNIQUE,
     description TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- ============================================================================
 -- TABLE 6: ENVIRONMENTAL_REPORTS
--- Description: Environmental incident reports submitted by users
--- ============================================================================
 CREATE TABLE environmental_reports (
-    report_id SERIAL PRIMARY KEY,
-    location_id INT NOT NULL,
-    report_type report_type_enum NOT NULL,
-    severity severity_type NOT NULL,
-    status report_status_type DEFAULT 'pending',
+    report_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    location_id INTEGER NOT NULL,
+    report_type VARCHAR(17) NOT NULL CHECK (report_type IN ('pollution', 'deforestation', 'waste_dumping', 'wildlife_incident', 'other')),
+    severity VARCHAR(8) NOT NULL CHECK (severity IN ('Critical', 'High', 'Medium', 'Low')),
+    status VARCHAR(11) DEFAULT 'pending' CHECK (status IN ('pending', 'in_progress', 'completed', 'closed')),
     title VARCHAR(200) NOT NULL,
     description TEXT NOT NULL,
     reporter_name VARCHAR(100),
@@ -147,99 +96,86 @@ CREATE TABLE environmental_reports (
     report_date DATE NOT NULL,
     resolution_date DATE,
     photo_url VARCHAR(255),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_reports_location FOREIGN KEY (location_id) REFERENCES locations(location_id) ON DELETE CASCADE
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (location_id) REFERENCES locations(location_id) ON DELETE CASCADE
 );
 
 CREATE INDEX idx_reports_type ON environmental_reports(report_type);
 CREATE INDEX idx_reports_status ON environmental_reports(status);
 CREATE INDEX idx_reports_severity ON environmental_reports(severity);
 
--- ============================================================================
 -- TABLE 7: USERS
--- Description: User accounts for authentication and authorization
--- ============================================================================
 CREATE TABLE users (
-    user_id SERIAL PRIMARY KEY,
-    username VARCHAR(50) UNIQUE NOT NULL,
+    user_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     full_name VARCHAR(100),
-    user_role user_role_type DEFAULT 'public',
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_login TIMESTAMP
+    user_role VARCHAR(6) DEFAULT 'public' CHECK (user_role IN ('admin', 'public')),
+    is_active BOOLEAN DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    last_login DATETIME
 );
 
 CREATE INDEX idx_users_role ON users(user_role);
 
--- ============================================================================
 -- TABLE 8: ACTIVITY_LOG
--- Description: Audit trail of user actions in the system
--- ============================================================================
 CREATE TABLE activity_log (
-    log_id SERIAL PRIMARY KEY,
-    user_id INT,
+    log_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
     action_type VARCHAR(50) NOT NULL,
     description TEXT,
     ip_address VARCHAR(45),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_activity_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL
 );
 
 CREATE INDEX idx_activity_user ON activity_log(user_id);
 CREATE INDEX idx_activity_date ON activity_log(created_at);
 
--- ============================================================================
 -- TABLE 9: DASHBOARD_STATS
--- Description: Cached statistics for dashboard performance
--- ============================================================================
 CREATE TABLE dashboard_stats (
-    stat_id SERIAL PRIMARY KEY,
-    stat_date DATE UNIQUE NOT NULL,
-    total_reports INT DEFAULT 0,
-    pending_reports INT DEFAULT 0,
-    completed_reports INT DEFAULT 0,
-    critical_reports INT DEFAULT 0,
-    total_sightings INT DEFAULT 0,
-    verified_sightings INT DEFAULT 0,
-    land_species_count INT DEFAULT 0,
-    water_species_count INT DEFAULT 0,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    stat_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    stat_date DATE NOT NULL UNIQUE,
+    total_reports INTEGER DEFAULT 0,
+    pending_reports INTEGER DEFAULT 0,
+    completed_reports INTEGER DEFAULT 0,
+    critical_reports INTEGER DEFAULT 0,
+    total_sightings INTEGER DEFAULT 0,
+    verified_sightings INTEGER DEFAULT 0,
+    land_species_count INTEGER DEFAULT 0,
+    water_species_count INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX idx_stats_date ON dashboard_stats(stat_date);
 
--- ============================================================================
--- FUNCTION: Auto-update updated_at timestamp
--- ============================================================================
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updated_at = CURRENT_TIMESTAMP;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
--- ============================================================================
--- TRIGGERS: Auto-update updated_at on UPDATE
--- ============================================================================
+-- TRIGGER: Auto-update updated_at timestamp on species
 CREATE TRIGGER update_species_updated_at 
-    BEFORE UPDATE ON species
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+    AFTER UPDATE ON species
+    FOR EACH ROW
+BEGIN
+    UPDATE species SET updated_at = CURRENT_TIMESTAMP WHERE species_id = OLD.species_id;
+END;
 
+-- TRIGGER: Auto-update updated_at timestamp on locations
 CREATE TRIGGER update_locations_updated_at 
-    BEFORE UPDATE ON locations
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+    AFTER UPDATE ON locations
+    FOR EACH ROW
+BEGIN
+    UPDATE locations SET updated_at = CURRENT_TIMESTAMP WHERE location_id = OLD.location_id;
+END;
 
+-- TRIGGER: Auto-update updated_at timestamp on environmental_reports
 CREATE TRIGGER update_environmental_reports_updated_at 
-    BEFORE UPDATE ON environmental_reports
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+    AFTER UPDATE ON environmental_reports
+    FOR EACH ROW
+BEGIN
+    UPDATE environmental_reports SET updated_at = CURRENT_TIMESTAMP WHERE report_id = OLD.report_id;
+END;
 
 
--- ============================================================================
 -- INSERT DATA: SPECIES (20 records - 12 land, 8 water)
--- ============================================================================
 
 -- Land Species - Birds (4)
 INSERT INTO species (common_name, scientific_name, category, species_type, conservation_status, status_trend, total_sightings_estimate, description, habitat_info, diet_info, photo_url) VALUES
@@ -279,9 +215,7 @@ INSERT INTO species (common_name, scientific_name, category, species_type, conse
 ('Spinner Dolphin', 'Stenella longirostris', 'water', 'mammal', 'Vulnerable', 'unknown', 'Unknown', 'Small, active dolphins known for spinning jumps. Feed on small fish and squid. Important part of marine food chain.', 'Tropical and subtropical oceans worldwide. Often found in groups, daylight hours in deeper offshore waters.', 'Small fish and squid caught during night feeding dives. Uses echolocation to hunt in deep waters.', '/static/img/Animals/spinner dolphin.jpeg'),
 ('Dwarf Sperm Whale', 'Kogia sima', 'water', 'mammal', 'Data Deficient', 'unknown', 'Unknown', 'A small, shy whale species rarely seen alive. Known for releasing a cloud of ink-like fluid to escape predators.', 'Deep offshore waters of tropical and subtropical oceans. Elusive and rarely observed in wild.', 'Deep-sea squid and fish. Dives to depths of 300-900m to hunt in deep water.', '/static/img/Animals/dwarf sperm whale.jpg');
 
--- ============================================================================
 -- INSERT DATA: LOCATIONS (34 records - 5 cities, 29 municipalities)
--- ============================================================================
 
 -- Cities (5)
 INSERT INTO locations (city_name, location_type, latitude, longitude, severity_level, total_reports) VALUES
@@ -323,9 +257,7 @@ INSERT INTO locations (city_name, location_type, latitude, longitude, severity_l
 ('Tingloy', 'municipality', 13.7333, 120.8667, 'Low', 0),
 ('Tuy', 'municipality', 14.0167, 120.7333, 'Low', 0);
 
--- ============================================================================
 -- INSERT DATA: REPORT_CATEGORIES (5 records)
--- ============================================================================
 INSERT INTO report_categories (name, description) VALUES
 ('Pollution', 'Air, water, soil, or noise pollution'),
 ('Deforestation', 'Illegal or unauthorized forest clearing'),
@@ -333,27 +265,21 @@ INSERT INTO report_categories (name, description) VALUES
 ('Wildlife Incident', 'Wildlife injury, trafficking, or habitat issues'),
 ('Other', 'Other environmental concerns');
 
--- ============================================================================
 -- INSERT DATA: REPORT_SEVERITY (4 records)
--- ============================================================================
 INSERT INTO report_severity (level, description) VALUES
 ('Low', 'Minor environmental impact, non-urgent'),
 ('Medium', 'Moderate impact, should be addressed soon'),
 ('High', 'Significant impact, requires prompt action'),
 ('Critical', 'Severe impact, immediate action required');
 
--- ============================================================================
 -- INSERT DATA: USERS (2 records)
--- ============================================================================
 INSERT INTO users (username, password, full_name, user_role, is_active) VALUES
-('admin', 'admin123', 'Administrator', 'admin', TRUE),
-('user1', 'user123', 'Public User', 'public', TRUE);
+('admin', 'admin123', 'Administrator', 'admin', 1),
+('user1', 'user123', 'Public User', 'public', 1);
 
--- ============================================================================
 -- INSERT DATA: ENVIRONMENTAL_REPORTS (10 records)
--- ============================================================================
 INSERT INTO environmental_reports (location_id, report_type, severity, status, title, description, reporter_name, reporter_contact, report_date) VALUES
-(5, 'pollution', 'Critical', 'pending', 'Illegal Waste Dumping at Batangas City Port', 'Large amounts of industrial waste found dumped near the port area. Immediate cleanup required.', 'Juan Dela Cruz', 'juan@email.com', '2025-12-01'),
+(1, 'pollution', 'Critical', 'pending', 'Illegal Waste Dumping at Batangas City Port', 'Large amounts of industrial waste found dumped near the port area. Immediate cleanup required.', 'Juan Dela Cruz', 'juan@email.com', '2025-12-01'),
 (25, 'deforestation', 'High', 'in_progress', 'Deforestation in Taal Watershed', 'Unauthorized tree cutting observed in the protected watershed area.', 'Maria Santos', 'maria@email.com', '2025-12-07'),
 (16, 'pollution', 'High', 'pending', 'Plastic Pollution at Nasugbu Beach', 'Excessive plastic waste accumulating along the shoreline, affecting marine life.', 'Pedro Reyes', '09123456789', '2025-12-07'),
 (8, 'wildlife_incident', 'Critical', 'in_progress', 'Wildlife Trafficking Suspected', 'Reports of illegal bird trading in the local market area.', 'Ana Garcia', 'ana.garcia@email.com', '2025-12-03'),
@@ -364,9 +290,7 @@ INSERT INTO environmental_reports (location_id, report_type, severity, status, t
 (13, 'deforestation', 'Critical', 'in_progress', 'Mangrove Area Being Cleared', 'Illegal clearing of protected mangrove forest for fish pond development.', 'Roberto Santos', '09176543210', '2025-12-02'),
 (10, 'other', 'Low', 'completed', 'Noise Pollution from Construction', 'Extended construction hours causing disturbance to wildlife in nearby area.', 'Carmen Reyes', 'carmen@email.com', '2025-11-15');
 
--- ============================================================================
 -- INSERT DATA: SIGHTINGS (20 records)
--- ============================================================================
 INSERT INTO sightings (species_id, location_id, sighting_date, number_observed, observer_name, observer_contact, verification_status, notes) VALUES
 (1, 6, '2025-12-01', 12, 'Maria Santos', 'maria@email.com', 'verified', 'Group of Philippine Ducks spotted near rice paddies'),
 (2, 10, '2025-12-02', 5, 'Juan Reyes', '09123456789', 'verified', 'White-breasted Waterhens foraging in wetland area'),
@@ -389,9 +313,7 @@ INSERT INTO sightings (species_id, location_id, sighting_date, number_observed, 
 (1, 15, '2025-12-06', 8, 'Patricia Martin', 'patricia@email.com', 'pending', 'Philippine Ducks in irrigation canal'),
 (3, 14, '2025-12-07', 6, 'James Taylor', '09119876543', 'verified', 'Garden Sunbirds in residential garden');
 
--- ============================================================================
 -- INSERT DATA: ACTIVITY_LOG (sample records)
--- ============================================================================
 INSERT INTO activity_log (user_id, action_type, description, ip_address) VALUES
 (1, 'User Login', 'Admin logged in successfully', '192.168.1.1'),
 (1, 'Create Report', 'Created environmental report #1', '192.168.1.1'),
@@ -400,15 +322,11 @@ INSERT INTO activity_log (user_id, action_type, description, ip_address) VALUES
 (1, 'Update Report', 'Updated report #1 status', '192.168.1.1'),
 (1, 'Delete User', 'Deleted inactive user account', '192.168.1.1');
 
--- ============================================================================
 -- INSERT DATA: DASHBOARD_STATS
--- ============================================================================
 INSERT INTO dashboard_stats (stat_date, total_reports, pending_reports, completed_reports, critical_reports, total_sightings, verified_sightings, land_species_count, water_species_count) VALUES
 ('2025-12-07', 10, 5, 2, 3, 20, 12, 12, 8);
 
--- ============================================================================
--- SQL QUERIES (PostgreSQL Syntax)
--- ============================================================================
+-- SQL QUERIES (SQLite Syntax)
 
 -- 1. GET ALL SPECIES WITH SPECIFIC COLUMNS
 SELECT species_id, common_name, scientific_name, category, species_type, 
@@ -557,7 +475,7 @@ FROM species
 WHERE category = 'land'
 ORDER BY species_type, common_name;
 
--- 15. GET RECENT SIGHTINGS (Last 30 days) - PostgreSQL syntax
+-- 15. GET RECENT SIGHTINGS (Last 30 days) - SQLite syntax
 SELECT 
     s.sighting_id,
     sp.common_name,
@@ -568,7 +486,7 @@ SELECT
 FROM sightings s
 INNER JOIN species sp ON s.species_id = sp.species_id
 INNER JOIN locations l ON s.location_id = l.location_id
-WHERE s.sighting_date >= CURRENT_DATE - INTERVAL '30 days'
+WHERE s.sighting_date >= DATE('now', '-30 days')
 ORDER BY s.sighting_date DESC;
 
 -- 16. GET DASHBOARD STATISTICS (Summary)
@@ -638,11 +556,7 @@ SELECT
     category,
     species_type,
     COUNT(*) AS species_count,
-    STRING_AGG(common_name, ', ') AS species_list
+    GROUP_CONCAT(common_name, ', ') AS species_list
 FROM species
 GROUP BY category, species_type
 ORDER BY category, species_type;
-
--- ============================================================================
--- END OF FILE
--- ============================================================================
