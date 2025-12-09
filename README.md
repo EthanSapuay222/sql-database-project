@@ -12,10 +12,10 @@ cd sql-database-project
 
 ### Step 2: Create Virtual Environment
 
-**Windows (PowerShell):**
-```powershell
+**Windows (Command Prompt):**
+```cmd
 python -m venv venv
-.\venv\Scripts\Activate.ps1
+venv\Scripts\activate.bat
 ```
 
 **Mac/Linux:**
@@ -60,25 +60,16 @@ Go to `http://localhost:5000`
 
 **Virtual environment won't activate?**
 - Make sure you're in the project directory
-- Try: `python -m venv venv` first
-- Then run the activate command again
+- Use Command Prompt instead: `venv\Scripts\activate.bat`
+- Or try: `python -m venv venv` first
 
 **pip install fails?**
 - Make sure virtual environment is activated (you should see `(venv)` in your terminal)
 - Try: `pip install --upgrade pip`
 - Then run `pip install -r requirements.txt` again
 
-**Can't connect to database?**
-- Make sure PostgreSQL is running and installed
-- Check that `.env` has the correct username and password
-- Verify the database name exists
-
 **Port 5000 already in use?**
 - Open `app.py` and change the last line:
   ```python
   app.run(port=5001)  # Change 5000 to 5001
   ```
-
-**Need to reset the database?**
-- Delete the database in PostgreSQL
-- Run `python seed.py` again
