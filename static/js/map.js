@@ -29,19 +29,77 @@ document.addEventListener("DOMContentLoaded", () => {
       const result = await response.json();
       
       if (result.success && result.data) {
-        BATANGAS_LGUS = result.data.map(location => ({
-          city: location.city_name,
-          lat: parseFloat(location.latitude),
-          lon: parseFloat(location.longitude),
-          severity: location.severity_level,
-          total: location.total_reports || 0,
-          location_id: location.location_id
-        }));
+        // Fetch all reports to calculate severity
+        const reportsResponse = await fetch('/api/reports');
+        const reportsData = await reportsResponse.json();
+        
+        const reportsByLocation = {};
+        
+        // Organize reports by location
+        if (reportsData.success && reportsData.data) {
+          reportsData.data.forEach(report => {
+            const locationId = report.location?.location_id;
+            if (locationId) {
+              if (!reportsByLocation[locationId]) {
+                reportsByLocation[locationId] = [];
+              }
+              reportsByLocation[locationId].push(report);
+            }
+          });
+        }
+        
+        // Calculate severity for each location
+        BATANGAS_LGUS = result.data.map(location => {
+          const reports = reportsByLocation[location.location_id] || [];
+          const severity = calculateSeverity(reports);
+          
+          return {
+            city: location.city_name,
+            lat: parseFloat(location.latitude),
+            lon: parseFloat(location.longitude),
+            severity: severity,
+            total: reports.length,
+            location_id: location.location_id
+          };
+        });
         
         plotAllMarkers();
       }
     } catch (error) {
       console.error('Error loading locations:', error);
+    }
+  }
+
+  // Calculate severity based on reports
+  function calculateSeverity(reports) {
+    if (reports.length === 0) {
+      return 'Low'; // No reports = Low severity
+    }
+    
+    const severityWeights = {
+      'Critical': 4,
+      'High': 3,
+      'Medium': 2,
+      'Low': 1
+    };
+    
+    let totalWeight = 0;
+    reports.forEach(report => {
+      const weight = severityWeights[report.severity] || 1;
+      totalWeight += weight;
+    });
+    
+    const averageWeight = totalWeight / reports.length;
+    
+    // Determine severity based on average weight
+    if (averageWeight >= 3.5) {
+      return 'Critical';
+    } else if (averageWeight >= 2.5) {
+      return 'High';
+    } else if (averageWeight >= 1.5) {
+      return 'Medium';
+    } else {
+      return 'Low';
     }
   }
 
@@ -117,11 +175,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   window.showDashboard = (cityName) => {
-    dashboardCityName.textContent = cityName;
-    mapView.style.display = "none";
-    dashboardView.style.display = "block";
-    map.closePopup();
-    window.scrollTo(0, 0);
+    // Redirect to the dashboard page
+    window.location.href = '/dashboard';
   };
 
   function applyFilter(selectedSeverity) {
