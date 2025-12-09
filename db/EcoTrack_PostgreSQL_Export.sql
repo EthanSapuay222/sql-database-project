@@ -1,15 +1,3 @@
--- ============================================================================
--- EcoTrack Database Schema - PostgreSQL Version
--- ============================================================================
--- Project: EcoTrack Environmental Monitoring System
--- Database: PostgreSQL
--- Version: 1.0
--- Created: December 2025
--- ============================================================================
-
--- ============================================================================
--- DROP EXISTING OBJECTS (for clean reinstall)
--- ============================================================================
 DROP TABLE IF EXISTS activity_log CASCADE;
 DROP TABLE IF EXISTS dashboard_stats CASCADE;
 DROP TABLE IF EXISTS sightings CASCADE;
@@ -29,22 +17,21 @@ DROP TYPE IF EXISTS report_type_enum CASCADE;
 DROP TYPE IF EXISTS report_status_type CASCADE;
 DROP TYPE IF EXISTS user_role_type CASCADE;
 
--- ============================================================================
+
 -- CREATE ENUM TYPES
--- ============================================================================
+
 CREATE TYPE category_type AS ENUM ('land', 'water');
 CREATE TYPE status_trend_type AS ENUM ('stable', 'increasing', 'decreasing', 'unknown');
 CREATE TYPE location_type_enum AS ENUM ('city', 'municipality');
-CREATE TYPE severity_type AS ENUM ('Critical', 'High', 'Medium', 'Low');
+CREATE TYPE severity_type AS ENUM ('Critical', 'High', 'Medium', 'Low', 'Informational', 'Warning', 'Emergency', 'Negligible', 'Severe', 'Unknown', 'Localized', 'Widespread', 'Temporary', 'Persistent', 'Recovering', 'Escalating', 'Contained', 'Unverified', 'Catastrophic', 'Resolve');
 CREATE TYPE verification_type AS ENUM ('pending', 'verified', 'rejected');
-CREATE TYPE report_type_enum AS ENUM ('pollution', 'deforestation', 'waste_dumping', 'wildlife_incident', 'other');
+CREATE TYPE report_type_enum AS ENUM ('pollution', 'deforestation', 'waste_dumping', 'wildlife_incident', 'air_quality_alert', 'chemical_spill', 'habitat_destruction', 'noise_disturbance', 'plastic_pollution', 'illegal_mining', 'urban_encroachment', 'water_contamination', 'invasive_species', 'climate_anomaly', 'oil leak', 'radiation exposure', 'coral bleaching', 'overfishing', 'illegal logging',
+'other');
 CREATE TYPE report_status_type AS ENUM ('pending', 'in_progress', 'completed', 'closed');
 CREATE TYPE user_role_type AS ENUM ('admin', 'public');
 
--- ============================================================================
--- TABLE 1: SPECIES
+
 -- Description: Stores information about wildlife species (land and water)
--- ============================================================================
 CREATE TABLE species (
     species_id SERIAL PRIMARY KEY,
     common_name VARCHAR(100) NOT NULL,
@@ -66,10 +53,9 @@ CREATE INDEX idx_species_category ON species(category);
 CREATE INDEX idx_species_type ON species(species_type);
 CREATE INDEX idx_conservation_status ON species(conservation_status);
 
--- ============================================================================
+
 -- TABLE 2: LOCATIONS
--- Description: Geographic locations (cities and municipalities in Batangas)
--- ============================================================================
+
 CREATE TABLE locations (
     location_id SERIAL PRIMARY KEY,
     city_name VARCHAR(100) NOT NULL,
@@ -85,10 +71,8 @@ CREATE TABLE locations (
 CREATE INDEX idx_locations_severity ON locations(severity_level);
 CREATE INDEX idx_locations_coordinates ON locations(latitude, longitude);
 
--- ============================================================================
--- TABLE 3: SIGHTINGS
+
 -- Description: Wildlife observation records linking species to locations
--- ============================================================================
 CREATE TABLE sightings (
     sighting_id SERIAL PRIMARY KEY,
     species_id INT NOT NULL,
@@ -108,10 +92,8 @@ CREATE INDEX idx_sightings_date ON sightings(sighting_date);
 CREATE INDEX idx_sightings_species ON sightings(species_id);
 CREATE INDEX idx_sightings_location ON sightings(location_id);
 
--- ============================================================================
+
 -- TABLE 4: REPORT_CATEGORIES
--- Description: Categories for environmental reports
--- ============================================================================
 CREATE TABLE report_categories (
     category_id SERIAL PRIMARY KEY,
     name VARCHAR(100) UNIQUE NOT NULL,
@@ -119,10 +101,8 @@ CREATE TABLE report_categories (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- ============================================================================
 -- TABLE 5: REPORT_SEVERITY
--- Description: Severity levels for environmental reports
--- ============================================================================
+
 CREATE TABLE report_severity (
     severity_id SERIAL PRIMARY KEY,
     level VARCHAR(50) UNIQUE NOT NULL,
@@ -130,10 +110,7 @@ CREATE TABLE report_severity (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- ============================================================================
 -- TABLE 6: ENVIRONMENTAL_REPORTS
--- Description: Environmental incident reports submitted by users
--- ============================================================================
 CREATE TABLE environmental_reports (
     report_id SERIAL PRIMARY KEY,
     location_id INT NOT NULL,
@@ -156,10 +133,7 @@ CREATE INDEX idx_reports_type ON environmental_reports(report_type);
 CREATE INDEX idx_reports_status ON environmental_reports(status);
 CREATE INDEX idx_reports_severity ON environmental_reports(severity);
 
--- ============================================================================
 -- TABLE 7: USERS
--- Description: User accounts for authentication and authorization
--- ============================================================================
 CREATE TABLE users (
     user_id SERIAL PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
@@ -173,10 +147,7 @@ CREATE TABLE users (
 
 CREATE INDEX idx_users_role ON users(user_role);
 
--- ============================================================================
 -- TABLE 8: ACTIVITY_LOG
--- Description: Audit trail of user actions in the system
--- ============================================================================
 CREATE TABLE activity_log (
     log_id SERIAL PRIMARY KEY,
     user_id INT,
@@ -190,10 +161,7 @@ CREATE TABLE activity_log (
 CREATE INDEX idx_activity_user ON activity_log(user_id);
 CREATE INDEX idx_activity_date ON activity_log(created_at);
 
--- ============================================================================
 -- TABLE 9: DASHBOARD_STATS
--- Description: Cached statistics for dashboard performance
--- ============================================================================
 CREATE TABLE dashboard_stats (
     stat_id SERIAL PRIMARY KEY,
     stat_date DATE UNIQUE NOT NULL,
@@ -210,9 +178,7 @@ CREATE TABLE dashboard_stats (
 
 CREATE INDEX idx_stats_date ON dashboard_stats(stat_date);
 
--- ============================================================================
 -- FUNCTION: Auto-update updated_at timestamp
--- ============================================================================
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -221,9 +187,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- ============================================================================
 -- TRIGGERS: Auto-update updated_at on UPDATE
--- ============================================================================
 CREATE TRIGGER update_species_updated_at 
     BEFORE UPDATE ON species
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
@@ -237,9 +201,7 @@ CREATE TRIGGER update_environmental_reports_updated_at
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 
--- ============================================================================
 -- INSERT DATA: SPECIES (20 records - 12 land, 8 water)
--- ============================================================================
 
 -- Land Species - Birds (4)
 INSERT INTO species (common_name, scientific_name, category, species_type, conservation_status, status_trend, total_sightings_estimate, description, habitat_info, diet_info, photo_url) VALUES
@@ -279,9 +241,6 @@ INSERT INTO species (common_name, scientific_name, category, species_type, conse
 ('Spinner Dolphin', 'Stenella longirostris', 'water', 'mammal', 'Vulnerable', 'unknown', 'Unknown', 'Small, active dolphins known for spinning jumps. Feed on small fish and squid. Important part of marine food chain.', 'Tropical and subtropical oceans worldwide. Often found in groups, daylight hours in deeper offshore waters.', 'Small fish and squid caught during night feeding dives. Uses echolocation to hunt in deep waters.', '/static/img/Animals/spinner dolphin.jpeg'),
 ('Dwarf Sperm Whale', 'Kogia sima', 'water', 'mammal', 'Data Deficient', 'unknown', 'Unknown', 'A small, shy whale species rarely seen alive. Known for releasing a cloud of ink-like fluid to escape predators.', 'Deep offshore waters of tropical and subtropical oceans. Elusive and rarely observed in wild.', 'Deep-sea squid and fish. Dives to depths of 300-900m to hunt in deep water.', '/static/img/Animals/dwarf sperm whale.jpg');
 
--- ============================================================================
--- INSERT DATA: LOCATIONS (34 records - 5 cities, 29 municipalities)
--- ============================================================================
 
 -- Cities (5)
 INSERT INTO locations (city_name, location_type, latitude, longitude, severity_level, total_reports) VALUES
@@ -323,35 +282,77 @@ INSERT INTO locations (city_name, location_type, latitude, longitude, severity_l
 ('Tingloy', 'municipality', 13.7333, 120.8667, 'Low', 0),
 ('Tuy', 'municipality', 14.0167, 120.7333, 'Low', 0);
 
--- ============================================================================
--- INSERT DATA: REPORT_CATEGORIES (5 records)
--- ============================================================================
+-- INSERT DATA: REPORT_CATEGORIES (20 records)
 INSERT INTO report_categories (name, description) VALUES
 ('Pollution', 'Air, water, soil, or noise pollution'),
 ('Deforestation', 'Illegal or unauthorized forest clearing'),
 ('Waste Dumping', 'Illegal waste disposal'),
 ('Wildlife Incident', 'Wildlife injury, trafficking, or habitat issues'),
+('Water Contamination', 'Contaminated rivers, lakes, or groundwater'),
+('Air Quality Alert', 'Hazardous air conditions due to smog or emissions'),
+('Illegal Mining', 'Unauthorized extraction of minerals or resources'),
+('Chemical Spill', 'Hazardous chemical release affecting environment'),
+('Habitat Destruction', 'Loss of natural habitats due to human activity'),
+('Oil Leak', 'Petroleum leakage affecting land or water'),
+('Noise Disturbance', 'Excessive noise from industrial or urban sources'),
+('Plastic Pollution', 'Accumulation of plastic waste in ecosystems'),
+('Radiation Exposure', 'Environmental radiation from industrial sources'),
+('Coral Bleaching', 'Damage to coral reefs due to temperature or pollution'),
+('Overfishing', 'Excessive fishing impacting marine biodiversity'),
+('Invasive Species', 'Non-native species disrupting local ecosystems'),
+('Illegal Logging', 'Unauthorized tree cutting in protected areas'),
+('Urban Encroachment', 'Expansion of cities into natural habitats'),
+('Climate Anomaly', 'Unusual weather patterns affecting ecosystems'),
 ('Other', 'Other environmental concerns');
 
--- ============================================================================
 -- INSERT DATA: REPORT_SEVERITY (4 records)
--- ============================================================================
 INSERT INTO report_severity (level, description) VALUES
 ('Low', 'Minor environmental impact, non-urgent'),
 ('Medium', 'Moderate impact, should be addressed soon'),
 ('High', 'Significant impact, requires prompt action'),
+('Informational', 'General observation, no immediate action needed'),
+('Warning', 'Potential risk, monitor closely'),
+('Emergency', 'Immediate danger, requires rapid response'),
+('Negligible', 'Minimal concern, unlikely to escalate'),
+('Severe', 'Major disruption or damage reported'),
+('Unknown', 'Severity not yet assessed'),
+('Localized', 'Impact confined to a small area'),
+('Widespread', 'Impact affecting multiple regions'),
+('Temporary', 'Short-term issue expected to resolve'),
+('Persistent', 'Ongoing issue requiring long-term monitoring'),
+('Recovering', 'Situation improving but still under observation'),
+('Escalating', 'Issue worsening over time'),
+('Contained', 'Issue under control, no further spread'),
+('Unverified', 'Reported but not yet confirmed'),
+('Catastrophic', 'Massive damage with long-term consequences'),
+('Resolved', 'Issue addressed and closed'),
 ('Critical', 'Severe impact, immediate action required');
 
--- ============================================================================
 -- INSERT DATA: USERS (2 records)
--- ============================================================================
 INSERT INTO users (username, password, full_name, user_role, is_active) VALUES
 ('admin', 'admin123', 'Administrator', 'admin', TRUE),
-('user1', 'user123', 'Public User', 'public', TRUE);
+('user1', 'user123', 'Public User', 'public', TRUE),
+('jane', 'mod456', 'Jane Dela Cruz', 'public', TRUE),
+('mike', 'data789', 'Mike Santos', 'public', TRUE),
+('guest_anna', 'guest001', 'Anna Reyes', 'public', TRUE),
+('admin2', 'secure456', 'System Admin', 'public', TRUE),
+('user2', 'pass234', 'Carlos Mendoza', 'public', TRUE),
+('paul', 'mod999', 'Paul Ramirez', 'public', TRUE),
+('lia', 'stats321', 'Lia Navarro', 'public', TRUE),
+('ben', 'guest002', 'Benjie Cruz', 'public', TRUE),
+('user3', 'user345', 'Rina Lopez', 'public', TRUE),
+('admin3', 'root789', 'Tech Admin', 'public', TRUE),
+('kate', 'mod007', 'Kate Villanueva', 'public', TRUE),
+('ron', 'data007', 'Ronald Lim', 'public', TRUE),
+('guest_mia', 'guest003', 'Mia Torres', 'public', TRUE),
+('user4', 'user456', 'Leo Garcia', 'public', TRUE),
+('ella', 'mod888', 'Ella Fernandez', 'public', TRUE),
+('jay', 'data123', 'Jay Mercado', 'public', TRUE),
+('guest_nico', 'guest004', 'Nico Tan', 'public', TRUE),
+('user5', 'user567', 'Grace Aquino', 'public', TRUE);
 
--- ============================================================================
--- INSERT DATA: ENVIRONMENTAL_REPORTS (10 records)
--- ============================================================================
+
+-- INSERT DATA: ENVIRONMENTAL_REPORTS (20 records)
 INSERT INTO environmental_reports (location_id, report_type, severity, status, title, description, reporter_name, reporter_contact, report_date) VALUES
 (5, 'pollution', 'Critical', 'pending', 'Illegal Waste Dumping at Batangas City Port', 'Large amounts of industrial waste found dumped near the port area. Immediate cleanup required.', 'Juan Dela Cruz', 'juan@email.com', '2025-12-01'),
 (25, 'deforestation', 'High', 'in_progress', 'Deforestation in Taal Watershed', 'Unauthorized tree cutting observed in the protected watershed area.', 'Maria Santos', 'maria@email.com', '2025-12-07'),
@@ -362,11 +363,19 @@ INSERT INTO environmental_reports (location_id, report_type, severity, status, t
 (3, 'pollution', 'High', 'pending', 'Air Pollution from Factory', 'Heavy smoke emission from manufacturing plant affecting nearby residents.', 'Antonio Cruz', '09198765432', '2025-12-05'),
 (20, 'wildlife_incident', 'Medium', 'pending', 'Injured Sea Turtle Found', 'Sea turtle found with fishing net entanglement on the beach.', 'Elena Flores', 'elena@email.com', '2025-12-06'),
 (13, 'deforestation', 'Critical', 'in_progress', 'Mangrove Area Being Cleared', 'Illegal clearing of protected mangrove forest for fish pond development.', 'Roberto Santos', '09176543210', '2025-12-02'),
-(10, 'other', 'Low', 'completed', 'Noise Pollution from Construction', 'Extended construction hours causing disturbance to wildlife in nearby area.', 'Carmen Reyes', 'carmen@email.com', '2025-11-15');
+(10, 'other', 'Low', 'completed', 'Noise Pollution from Construction', 'Extended construction hours causing disturbance to wildlife in nearby area.', 'Carmen Reyes', 'carmen@email.com', '2025-11-15'),
+(11, 'urban_encroachment', 'Medium', 'pending', 'Construction Near Protected Forest', 'Buildings encroaching on forest boundary', 'Kyle Mercado', 'kyle@example.com', '2025-11-11'),
+(12, 'water_contamination', 'High', 'in_progress', 'Contaminated Well in Taysan', 'Water tests show high toxicity', 'Lia Villanueva', 'lia@example.com', '2025-11-12'),
+(13, 'invasive_species', 'Medium', 'pending', 'Invasive Plant in Mataasnakahoy', 'Non-native plant spreading rapidly', 'Mia Aquino', 'mia@example.com', '2025-11-13'),
+(14, 'climate_anomaly', 'Informational', 'closed', 'Unusual Rainfall in Rosario', 'Rainfall patterns deviating from norm', 'Nico Dela Cruz', 'nico@example.com', '2025-11-14'),
+(15, 'wildlife_incident', 'Medium', 'pending', 'Stranded Dolphin in Balayan', 'Dolphin found stranded on shore', 'Olive Ramos', 'olive@example.com', '2025-11-15'),
+(16, 'pollution', 'Critical', 'in_progress', 'Toxic Smoke in Malvar', 'Factory emitting toxic fumes', 'Pauline Garcia', 'pauline@example.com', '2025-11-16'),
+(17, 'deforestation', 'High', 'pending', 'Tree Cutting in Laurel Highlands', 'Forest clearing for road expansion', 'Quinn Lopez', 'quinn@example.com', '2025-11-17'),
+(18, 'waste_dumping', 'Medium', 'pending', 'Garbage Pile in San Pascual', 'Uncollected garbage causing odor', 'Rico Tan', 'rico@example.com', '2025-11-18'),
+(19, 'chemical_spill', 'Critical', 'in_progress', 'Toxic Spill in Tanauan River', 'Chemical waste leaking into river', 'Sofia Lim', 'sofia@example.com', '2025-11-19'),
+(20, 'air_quality_alert', 'Medium', 'closed', 'Dust Storm in Padre Garcia', 'Strong winds carrying dust', 'Troy Santos', 'troy@example.com', '2025-11-20');
 
--- ============================================================================
 -- INSERT DATA: SIGHTINGS (20 records)
--- ============================================================================
 INSERT INTO sightings (species_id, location_id, sighting_date, number_observed, observer_name, observer_contact, verification_status, notes) VALUES
 (1, 6, '2025-12-01', 12, 'Maria Santos', 'maria@email.com', 'verified', 'Group of Philippine Ducks spotted near rice paddies'),
 (2, 10, '2025-12-02', 5, 'Juan Reyes', '09123456789', 'verified', 'White-breasted Waterhens foraging in wetland area'),
@@ -389,26 +398,34 @@ INSERT INTO sightings (species_id, location_id, sighting_date, number_observed, 
 (1, 15, '2025-12-06', 8, 'Patricia Martin', 'patricia@email.com', 'pending', 'Philippine Ducks in irrigation canal'),
 (3, 14, '2025-12-07', 6, 'James Taylor', '09119876543', 'verified', 'Garden Sunbirds in residential garden');
 
--- ============================================================================
 -- INSERT DATA: ACTIVITY_LOG (sample records)
--- ============================================================================
 INSERT INTO activity_log (user_id, action_type, description, ip_address) VALUES
 (1, 'User Login', 'Admin logged in successfully', '192.168.1.1'),
 (1, 'Create Report', 'Created environmental report #1', '192.168.1.1'),
 (2, 'User Login', 'User logged in', '192.168.1.2'),
 (2, 'Add Sighting', 'Added new species sighting', '192.168.1.2'),
 (1, 'Update Report', 'Updated report #1 status', '192.168.1.1'),
-(1, 'Delete User', 'Deleted inactive user account', '192.168.1.1');
+(11, 'Delete User', 'Deleted inactive user account', '192.168.1.1'),
+(14, 'User Login', 'User logged in successfully', '192.168.1.1'),
+(2, 'Create Report', 'Created environmental report #2', '192.168.1.2'),
+(15, 'Add Sighting', 'Added new species sighting', '192.168.1.3'),
+(13, 'Update Report', 'Updated report #2 status', '192.168.1.1'),
+(3, 'Delete User', 'Deleted inactive user account', '192.168.1.2'),
+(5, 'User Login', 'User logged in successfully', '192.168.1.3'),
+(7, 'Create Report', 'Created environmental report #3', '192.168.1.1'),
+(8, 'Add Sighting', 'Added new species sighting', '192.168.1.2'),
+(9, 'Update Report', 'Updated report #3 status', '192.168.1.3'),
+(17, 'Delete User', 'Deleted inactive user account', '192.168.1.1'),
+(4, 'User Login', 'User logged in successfully', '192.168.1.2'),
+(19, 'Create Report', 'Created environmental report #4', '192.168.1.3'),
+(6, 'Add Sighting', 'Added new species sighting', '192.168.1.1'),
+(8, 'Update Report', 'Updated report #4 status', '192.168.1.2');
 
--- ============================================================================
 -- INSERT DATA: DASHBOARD_STATS
--- ============================================================================
 INSERT INTO dashboard_stats (stat_date, total_reports, pending_reports, completed_reports, critical_reports, total_sightings, verified_sightings, land_species_count, water_species_count) VALUES
-('2025-12-07', 10, 5, 2, 3, 20, 12, 12, 8);
+('2025-12-07', 20, 10, 2, 3, 20, 12, 12, 8);
 
--- ============================================================================
--- SQL QUERIES (PostgreSQL Syntax)
--- ============================================================================
+-- SQL QUERIES
 
 -- 1. GET ALL SPECIES WITH SPECIFIC COLUMNS
 SELECT species_id, common_name, scientific_name, category, species_type, 
@@ -642,7 +659,3 @@ SELECT
 FROM species
 GROUP BY category, species_type
 ORDER BY category, species_type;
-
--- ============================================================================
--- END OF FILE
--- ============================================================================
