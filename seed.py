@@ -3,7 +3,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from app import app
-from model import Location, ReportCategory, ReportSeverity, Species, EnvironmentalReport, Sighting
+from model import Location, ReportCategory, ReportSeverity, Species, EnvironmentalReport, Sighting, User
 from database import db
 from datetime import date, timedelta
 import random
@@ -753,6 +753,31 @@ def seed_sample_reports():
     return inserted
 
 
+def seed_admin_user():
+    """Create default admin user for login"""
+    try:
+        # Check if admin user already exists
+        admin = User.query.filter_by(username='admin').first()
+        if admin:
+            return 0  # Already exists, don't create duplicate
+        
+        # Create new admin user
+        admin_user = User(
+            username='admin',
+            password='admin123',
+            email='admin@ecotrack.local',
+            user_role='admin',
+            is_active=True
+        )
+        
+        db.session.add(admin_user)
+        db.session.commit()
+        return 1
+    except Exception as e:
+        print(f"      [WARN] Error creating admin user: {e}")
+        return 0
+
+
 def main():
     """Run all seeding operations"""
     with app.app_context():
@@ -760,33 +785,41 @@ def main():
         print("[SEED] MASTER SEED - EcoTrack Database Initialization")
         print("=" * 70)
 
+        # Seed Admin User
+        print("\n[0/7] Creating default admin user...")
+        admin_inserted = seed_admin_user()
+        if admin_inserted:
+            print(f"      [OK] Admin User - Created (username: admin, password: admin123)")
+        else:
+            print(f"      [OK] Admin User - Already exists or skipped")
+
         # Seed Locations
-        print("\n[1/6] Seeding Locations (34 Batangas cities & municipalities)...")
+        print("\n[1/7] Seeding Locations (34 Batangas cities & municipalities)...")
         loc_inserted, loc_updated = seed_locations()
         print(f"      [OK] Locations - Inserted: {loc_inserted}, Updated: {loc_updated}")
 
         # Seed Categories
-        print("\n[2/6] Seeding Report Categories (5 types)...")
+        print("\n[2/7] Seeding Report Categories (5 types)...")
         cat_inserted, cat_updated = seed_categories()
         print(f"      [OK] Categories - Inserted: {cat_inserted}, Updated: {cat_updated}")
 
         # Seed Severity
-        print("\n[3/6] Seeding Report Severity Levels (4 levels)...")
+        print("\n[3/7] Seeding Report Severity Levels (4 levels)...")
         sev_inserted, sev_updated = seed_severity()
         print(f"      [OK] Severity Levels - Inserted: {sev_inserted}, Updated: {sev_updated}")
 
         # Seed Species
-        print("\n[4/6] Seeding Species (20 land and water animals)...")
+        print("\n[4/7] Seeding Species (20 land and water animals)...")
         spec_inserted, spec_updated = seed_species()
         print(f"      [OK] Species - Inserted: {spec_inserted}, Updated: {spec_updated}")
 
         # Seed Sample Sightings
-        print("\n[5/6] Seeding Sample Animal Sightings (10 sightings with real animal names)...")
+        print("\n[5/7] Seeding Sample Animal Sightings (10 sightings with real animal names)...")
         sight_inserted = seed_sightings()
         print(f"      [OK] Sample Sightings - Inserted: {sight_inserted}")
 
         # Seed Sample Reports
-        print("\n[6/6] Seeding Sample Environmental Reports (10 test reports)...")
+        print("\n[6/7] Seeding Sample Environmental Reports (10 test reports)...")
         rep_inserted = seed_sample_reports()
         print(f"      [OK] Sample Reports - Inserted: {rep_inserted}")
 
@@ -794,6 +827,7 @@ def main():
         print("[SUCCESS] SEEDING COMPLETE!")
         print("=" * 70)
         print(f"\nTotal Summary:")
+        print(f"  - Admin User:      {admin_inserted} created")
         print(f"  - Locations:       {loc_inserted} inserted, {loc_updated} updated")
         print(f"  - Categories:      {cat_inserted} inserted, {cat_updated} updated")
         print(f"  - Severity:        {sev_inserted} inserted, {sev_updated} updated")

@@ -54,7 +54,7 @@ Go to `http://localhost:5000`
 
 **Default Login:**
 - Username: `admin`
-- Password: `admin`
+- Password: `admin123`
 
 ## Troubleshooting
 
