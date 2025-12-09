@@ -4,7 +4,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from app import app
 from model import Location, ReportCategory, ReportSeverity, Species, EnvironmentalReport, Sighting, User
-from database import db
+from database import db, create_tables
 from datetime import date, timedelta
 import random
 
@@ -784,6 +784,11 @@ def main():
         print("=" * 70)
         print("[SEED] MASTER SEED - EcoTrack Database Initialization")
         print("=" * 70)
+        
+        # Create tables if they don't exist
+        print("\n[0/6] Creating database tables if they don't exist...")
+        create_tables(app)
+        print("      [OK] Database tables created/verified")
 
         # Seed Admin User
         print("\n[0/7] Creating default admin user...")
