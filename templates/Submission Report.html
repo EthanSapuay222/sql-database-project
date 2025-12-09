@@ -76,6 +76,7 @@
       <!-- Environmental Report Form -->
       <div id="form-environmental" class="form-container">
         <form id="report-form" class="space-y-6">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <div>
           <label
             for="report-title"
@@ -172,6 +173,7 @@
       <!-- Animal Sighting Form -->
       <div id="form-sighting" class="form-container hidden">
         <form id="sighting-form" class="space-y-6">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
           <div>
             <label
               for="species"
@@ -215,6 +217,23 @@
               name="number-observed"
               min="1"
               value="1"
+              required
+              class="form-field"
+            />
+          </div>
+
+          <div>
+            <label
+              for="sighting-date"
+              class="block text-sm font-medium text-[#4b553c] mb-1"
+            >
+              Date of Sighting
+              <span class="pill-label">When did you see it?</span>
+            </label>
+            <input
+              type="date"
+              id="sighting-date"
+              name="sighting-date"
               required
               class="form-field"
             />

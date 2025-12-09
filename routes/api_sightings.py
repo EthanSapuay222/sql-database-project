@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from model import Sighting
 from database import db
+from datetime import datetime
 
 api_sightings = Blueprint('api_sightings', __name__, url_prefix='/api/sightings')
 
@@ -22,7 +23,7 @@ def get_sightings():
     if status:
         query = query.filter_by(verification_status=status)
     
-    sightings = query.order_by(Sighting.sighting_date.desc()).limit(limit).all()
+    sightings = query.order_by(Sighting.sighting_date.desc(), Sighting.created_at.desc()).limit(limit).all()
     
     return jsonify({
         'success': True,
@@ -57,13 +58,21 @@ def create_sighting():
                 }), 400
         
         # Create new sighting
+        sighting_date = None
+        if data.get('sighting_date'):
+            try:
+                sighting_date = datetime.strptime(data['sighting_date'], '%Y-%m-%d').date()
+            except (ValueError, TypeError):
+                sighting_date = None
+        
         new_sighting = Sighting(
             species_id=data['species_id'],
             location_id=data['location_id'],
             number_observed=data.get('number_observed', 1),
             observer_name=data['observer_name'],
             observer_contact=data['observer_contact'],
-            notes=data.get('notes')
+            notes=data.get('notes'),
+            sighting_date=sighting_date
         )
         
         db.session.add(new_sighting)
@@ -81,7 +90,6 @@ def create_sighting():
             'success': False,
             'message': f'Error creating sighting: {str(e)}'
         }), 500
-
 
 @api_sightings.route('/<int:sighting_id>', methods=['PUT'])
 def update_sighting_status(sighting_id):

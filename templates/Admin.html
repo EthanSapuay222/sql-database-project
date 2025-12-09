@@ -17,49 +17,136 @@
     </header>
 
     <main class="admin-main">
-        <h2>Environmental Reports Management</h2>
-        <p>Review, edit, and manage user-submitted environmental reports</p>
+        <h2>EcoTrack Admin Dashboard</h2>
+        <p>Manage environmental reports, animal sightings, and users</p>
 
-        <div class="summary">
-            <div class="summary-card">
-                <h3>Total Reports</h3>
-                <p class="summary-number" id="total-reports">0</p>
-            </div>
-            <div class="summary-card">
-                <h3>Pending Review</h3>
-                <p class="summary-number" id="pending-reports">0</p>
-            </div>
-            <div class="summary-card">
-                <h3>Approved</h3>
-                <p class="summary-number" id="approved-reports">0</p>
-            </div>
+        <!-- Tab Navigation -->
+        <div class="admin-tabs">
+            <button class="tab-button active" onclick="switchTab('reports')">Environmental Reports</button>
+            <button class="tab-button" onclick="switchTab('sightings')">Animal Sightings</button>
+            <button class="tab-button" onclick="switchTab('users')">Users</button>
         </div>
 
-        <section class="reports-section">
-            <h3>User Reports</h3>
-            <table class="reports-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Title</th>
-                        <th>Type</th>
-                        <th>Severity</th>
-                        <th>Status</th>
-                        <th>Reporter</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="reports-tbody">
-                    <tr>
-                        <td colspan="7" style="text-align: center;">No reports submitted yet</td>
-                    </tr>
-                </tbody>
-            </table>
+        <!-- Environmental Reports Section -->
+        <section id="reports-tab" class="tab-content active">
+            <h2>Environmental Reports Management</h2>
+
+            <div class="summary">
+                <div class="summary-card">
+                    <h3>Total Reports</h3>
+                    <p class="summary-number" id="total-reports">0</p>
+                </div>
+                <div class="summary-card">
+                    <h3>Pending Review</h3>
+                    <p class="summary-number" id="pending-reports">0</p>
+                </div>
+                <div class="summary-card">
+                    <h3>Approved</h3>
+                    <p class="summary-number" id="approved-reports">0</p>
+                </div>
+            </div>
+
+            <section class="reports-section">
+                <h3>User Reports</h3>
+                <table class="reports-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Title</th>
+                            <th>Type</th>
+                            <th>Severity</th>
+                            <th>Status</th>
+                            <th>Reporter</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reports-tbody">
+                        <tr>
+                            <td colspan="7" style="text-align: center;">No reports submitted yet</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <div class="save-container">
+                <button id="save-btn" class="save-button" onclick="saveAllChanges()">Save All Changes</button>
+            </div>
         </section>
 
-        <div class="save-container">
-            <button id="save-btn" class="save-button" onclick="saveAllChanges()">Save All Changes</button>
-        </div>
+        <!-- Animal Sightings Section -->
+        <section id="sightings-tab" class="tab-content hidden">
+            <h2>Animal Sightings Management</h2>
+
+            <div class="summary">
+                <div class="summary-card">
+                    <h3>Total Sightings</h3>
+                    <p class="summary-number" id="total-sightings">0</p>
+                </div>
+                <div class="summary-card">
+                    <h3>Pending Verification</h3>
+                    <p class="summary-number" id="pending-sightings">0</p>
+                </div>
+                <div class="summary-card">
+                    <h3>Verified</h3>
+                    <p class="summary-number" id="verified-sightings">0</p>
+                </div>
+            </div>
+
+            <section class="sightings-section">
+                <h3>Animal Sightings</h3>
+                <table class="sightings-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Species</th>
+                            <th>Location</th>
+                            <th>Observer</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sightings-tbody">
+                        <tr>
+                            <td colspan="7" style="text-align: center;">No sightings submitted yet</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </section>
+
+        <!-- Users Section -->
+        <section id="users-tab" class="tab-content hidden">
+            <h2>User Management</h2>
+
+            <div class="summary">
+                <div class="summary-card">
+                    <h3>Total Users</h3>
+                    <p class="summary-number" id="total-users">0</p>
+                </div>
+            </div>
+
+            <section class="users-section">
+                <h3>Users</h3>
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-tbody">
+                        <tr>
+                            <td colspan="6" style="text-align: center;">No users found</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </section>
     </main>
 
     <!-- Report Detail Modal -->

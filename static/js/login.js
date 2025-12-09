@@ -74,6 +74,9 @@ function handleRegisterSubmit(event) {
 
     const registerForm = event.target;
     const formData = new FormData(registerForm);
+    
+    // Get CSRF token
+    const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
 
     // Clear previous error messages
     const errorMessages = document.querySelectorAll('#user-register .mb-4.p-4.bg-red-100');
@@ -85,7 +88,10 @@ function handleRegisterSubmit(event) {
 
     fetch('/user_register', {
         method: 'POST',
-        body: formData
+        body: formData,
+        headers: {
+            'X-CSRFToken': csrfToken
+        }
     })
     .then(response => response.json())
     .then(data => {

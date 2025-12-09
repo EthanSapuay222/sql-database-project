@@ -3,16 +3,13 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from app import app
-from model import Location, ReportCategory, ReportSeverity, Species, EnvironmentalReport
+from model import Location, ReportCategory, ReportSeverity, Species, EnvironmentalReport, Sighting
 from database import db
 from datetime import date, timedelta
 import random
 
 
 # SECTION 1: LOCATIONS DATA
-
-# 34 locations covering Batangas: 5 cities + 29 municipalities
-# Fields: city_name, location_type (city/municipality), latitude, longitude, severity_level
 
 SAMPLE_LOCATIONS = [
     # CITIES
@@ -54,23 +51,7 @@ SAMPLE_LOCATIONS = [
     {'city_name': 'Tuy', 'latitude': 14.0167, 'location_type': 'municipality', 'longitude': 120.7333, 'severity_level': 'Low'},
 ]
 
-
-# ============================================================================
 # SECTION 2: REPORT CATEGORIES DATA
-# ============================================================================
-# 5 categories for environmental reports
-# Used in submission form dropdown and dashboard filtering
-#
-# ⚠️ IMPORTANT: Category names are converted to enum values in the database!
-# Conversion: name.lower().replace(' ', '_')
-# Example: "Waste Dumping" → "waste_dumping"
-#
-# If you change these categories, you MUST also update:
-# 1. model.py → EnvironmentalReport.report_type Enum values
-# 2. forms.py → EnvironmentalReportForm.report_type choices
-# 3. All SAMPLE_REPORTS below that reference these categories
-#
-# Current enum values: pollution, deforestation, waste_dumping, wildlife_incident, other
 
 SAMPLE_CATEGORIES = [
     {'name': 'Pollution', 'description': 'Air, water, soil, or noise pollution'},
@@ -80,21 +61,7 @@ SAMPLE_CATEGORIES = [
     {'name': 'Other', 'description': 'Other environmental concerns'},
 ]
 
-
-# ============================================================================
 # SECTION 3: REPORT SEVERITY LEVELS DATA
-# ============================================================================
-# 4 severity levels for environmental reports
-# Used in submission form dropdown and dashboard stats
-#
-# ⚠️ IMPORTANT: Severity levels are case-sensitive in the database!
-# Enum values: Critical, High, Medium, Low (capitalized)
-#
-# If you change these levels, you MUST also update:
-# 1. model.py → EnvironmentalReport.severity Enum values
-# 2. model.py → Location.severity_level Enum values
-# 3. forms.py → EnvironmentalReportForm.severity choices
-# 4. All SAMPLE_REPORTS and SAMPLE_LOCATIONS that reference severity
 
 SAMPLE_SEVERITY = [
     {'level': 'Low', 'description': 'Minor environmental impact, non-urgent'},
@@ -103,12 +70,7 @@ SAMPLE_SEVERITY = [
     {'level': 'Critical', 'description': 'Severe impact, immediate action required'},
 ]
 
-
-# ============================================================================
 # SECTION 4: SPECIES DATA
-# ============================================================================
-# 20 species: 12 land animals, 8 water animals
-# Used in Life on Land and Water page and animal sighting submissions
 
 LAND_SPECIES = [
     # Birds
@@ -368,11 +330,92 @@ WATER_SPECIES = [
     },
 ]
 
+# SECTION 5: SAMPLE ANIMAL SIGHTINGS DATA
 
-# ============================================================================
-# SECTION 5: SAMPLE REPORTS DATA
-# ============================================================================
-# 10 sample environmental reports for testing dashboard and map
+SAMPLE_SIGHTINGS = [
+    {
+        'species_common_name': 'Philippine Duck',
+        'location_name': 'Batangas City',
+        'number_observed': 8,
+        'observer_name': 'Maria Santos',
+        'observer_contact': '09175551234',
+        'notes': 'Flock spotted at dawn near the wetlands area, very active feeding behavior observed'
+    },
+    {
+        'species_common_name': 'White-breasted Waterhen',
+        'location_name': 'Nasugbu',
+        'number_observed': 3,
+        'observer_name': 'Juan dela Cruz',
+        'observer_contact': '09165552345',
+        'notes': 'Observed in marshy areas during afternoon, moving through reed beds near water'
+    },
+    {
+        'species_common_name': 'Garden Sunbird',
+        'location_name': 'Taal',
+        'number_observed': 2,
+        'observer_name': 'Anna Reyes',
+        'observer_contact': '09185553456',
+        'notes': 'Beautiful male specimen with iridescent plumage feeding on flowering plants'
+    },
+    {
+        'species_common_name': 'Collared Kingfisher',
+        'location_name': 'Mabini',
+        'number_observed': 1,
+        'observer_name': 'Carlos Romero',
+        'observer_contact': '09195554567',
+        'notes': 'Perched prominently on tree branch near water, distinctive loud call heard multiple times'
+    },
+    {
+        'species_common_name': 'Greater Musky Fruit Bat',
+        'location_name': 'Lipa City',
+        'number_observed': 5,
+        'observer_name': 'Rosa Mendoza',
+        'observer_contact': '09165555678',
+        'notes': 'Group roosting under bridge structure at dusk, preparing for night foraging activities'
+    },
+    {
+        'species_common_name': 'Philippine Long-Tailed Macaque',
+        'location_name': 'Laurel',
+        'number_observed': 12,
+        'observer_name': 'Miguel Torres',
+        'observer_contact': '09176666789',
+        'notes': 'Troop observed in forest area, juveniles playing while adults foraged for fruits'
+    },
+    {
+        'species_common_name': 'Tokay Gecko',
+        'location_name': 'San Juan',
+        'number_observed': 2,
+        'observer_name': 'Patricia Villar',
+        'observer_contact': '09187777890',
+        'notes': 'Nocturnal geckos spotted on tree bark at night, making their distinctive loud calls'
+    },
+    {
+        'species_common_name': 'Common House Gecko',
+        'location_name': 'Lobo',
+        'number_observed': 4,
+        'observer_name': 'Daniel Garcia',
+        'observer_contact': '09198888901',
+        'notes': 'Found climbing walls of house at night hunting for insects around lights'
+    },
+    {
+        'species_common_name': 'Green Turtle',
+        'location_name': 'Calatagan',
+        'number_observed': 1,
+        'observer_name': 'Elena Santos',
+        'observer_contact': '09209999012',
+        'notes': 'Marine turtle spotted in shallow coastal waters feeding on seagrass beds'
+    },
+    {
+        'species_common_name': 'Blacktip Reef Shark',
+        'location_name': 'Balayan',
+        'number_observed': 2,
+        'observer_name': 'Fernando Lopez',
+        'observer_contact': '09201010123',
+        'notes': 'Small reef sharks with distinctive black-tipped fins observed in shallow reef area'
+    },
+]
+
+# SECTION 6: SAMPLE REPORTS DATA
 
 SAMPLE_REPORTS = [
     {
@@ -467,10 +510,7 @@ SAMPLE_REPORTS = [
     }
 ]
 
-
-# ============================================================================
 # SEEDING FUNCTIONS
-# ============================================================================
 
 def seed_locations():
     """Seed locations table with upsert logic (insert or update)"""
@@ -612,6 +652,64 @@ def seed_species():
     return inserted, updated
 
 
+def seed_sightings():
+    """Seed sample wildlife sightings for dashboard"""
+    inserted = 0
+    
+    # Get all locations and species
+    locations = Location.query.all()
+    species_list = Species.query.all()
+    
+    if not locations or not species_list:
+        print("      [WARN] No locations or species found! Skipping sightings.")
+        return 0
+    
+    # Clear existing sightings
+    Sighting.query.delete()
+    
+    # Add sample sightings
+    for sighting_data in SAMPLE_SIGHTINGS:
+        try:
+            # Find location by name
+            location = Location.query.filter_by(city_name=sighting_data['location_name']).first()
+            if not location:
+                location = random.choice(locations)
+            
+            # Find species by common name
+            species = Species.query.filter_by(common_name=sighting_data['species_common_name']).first()
+            if not species:
+                # Try case-insensitive search
+                all_species = Species.query.all()
+                species_name_lower = sighting_data['species_common_name'].lower()
+                for s in all_species:
+                    if s.common_name and s.common_name.lower() == species_name_lower:
+                        species = s
+                        break
+            if not species:
+                species = random.choice(species_list)
+            
+            # Create sighting with only fields users can submit
+            sighting = Sighting(
+                species_id=species.species_id,
+                location_id=location.location_id,
+                number_observed=sighting_data.get('number_observed', 1),
+                observer_name=sighting_data['observer_name'],
+                observer_contact=sighting_data['observer_contact'],
+                notes=sighting_data.get('notes')
+            )
+            
+            db.session.add(sighting)
+            inserted += 1
+        except Exception as e:
+            print(f"      [WARN] Error adding sighting: {e}")
+            continue
+    
+    if inserted:
+        db.session.commit()
+    
+    return inserted
+
+
 def seed_sample_reports():
     """Seed sample environmental reports for testing"""
     inserted = 0
@@ -659,42 +757,48 @@ def main():
     """Run all seeding operations"""
     with app.app_context():
         print("=" * 70)
-        print("🌱 MASTER SEED - EcoTrack Database Initialization")
+        print("[SEED] MASTER SEED - EcoTrack Database Initialization")
         print("=" * 70)
 
         # Seed Locations
-        print("\n[1/5] Seeding Locations (34 Batangas cities & municipalities)...")
+        print("\n[1/6] Seeding Locations (34 Batangas cities & municipalities)...")
         loc_inserted, loc_updated = seed_locations()
-        print(f"      ✅ Locations - Inserted: {loc_inserted}, Updated: {loc_updated}")
+        print(f"      [OK] Locations - Inserted: {loc_inserted}, Updated: {loc_updated}")
 
         # Seed Categories
-        print("\n[2/5] Seeding Report Categories (5 types)...")
+        print("\n[2/6] Seeding Report Categories (5 types)...")
         cat_inserted, cat_updated = seed_categories()
-        print(f"      ✅ Categories - Inserted: {cat_inserted}, Updated: {cat_updated}")
+        print(f"      [OK] Categories - Inserted: {cat_inserted}, Updated: {cat_updated}")
 
         # Seed Severity
-        print("\n[3/5] Seeding Report Severity Levels (4 levels)...")
+        print("\n[3/6] Seeding Report Severity Levels (4 levels)...")
         sev_inserted, sev_updated = seed_severity()
-        print(f"      ✅ Severity Levels - Inserted: {sev_inserted}, Updated: {sev_updated}")
+        print(f"      [OK] Severity Levels - Inserted: {sev_inserted}, Updated: {sev_updated}")
 
         # Seed Species
-        print("\n[4/5] Seeding Species (20 land and water animals)...")
+        print("\n[4/6] Seeding Species (20 land and water animals)...")
         spec_inserted, spec_updated = seed_species()
-        print(f"      ✅ Species - Inserted: {spec_inserted}, Updated: {spec_updated}")
+        print(f"      [OK] Species - Inserted: {spec_inserted}, Updated: {spec_updated}")
+
+        # Seed Sample Sightings
+        print("\n[5/6] Seeding Sample Animal Sightings (10 sightings with real animal names)...")
+        sight_inserted = seed_sightings()
+        print(f"      [OK] Sample Sightings - Inserted: {sight_inserted}")
 
         # Seed Sample Reports
-        print("\n[5/5] Seeding Sample Environmental Reports (10 test reports)...")
+        print("\n[6/6] Seeding Sample Environmental Reports (10 test reports)...")
         rep_inserted = seed_sample_reports()
-        print(f"      ✅ Sample Reports - Inserted: {rep_inserted}")
+        print(f"      [OK] Sample Reports - Inserted: {rep_inserted}")
 
         print("\n" + "=" * 70)
-        print("✅ SEEDING COMPLETE!")
+        print("[SUCCESS] SEEDING COMPLETE!")
         print("=" * 70)
         print(f"\nTotal Summary:")
         print(f"  - Locations:       {loc_inserted} inserted, {loc_updated} updated")
         print(f"  - Categories:      {cat_inserted} inserted, {cat_updated} updated")
         print(f"  - Severity:        {sev_inserted} inserted, {sev_updated} updated")
         print(f"  - Species:         {spec_inserted} inserted, {spec_updated} updated")
+        print(f"  - Sample Sightings:{sight_inserted} inserted")
         print(f"  - Sample Reports:  {rep_inserted} inserted")
         print("\n")
 

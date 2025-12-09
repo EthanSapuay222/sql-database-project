@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
   loadSightingsByLocation('land');
   loadSightingsByLocation('water');
   loadReports();
+  loadAnimalSightings();
   loadDashboardStats();
 });
 
@@ -214,6 +215,44 @@ async function loadReports() {
     const reportsList = document.getElementById('reports-list');
     if (reportsList) {
       reportsList.innerHTML = '<p class="text-red-500 text-center text-sm col-span-full">Error loading reports</p>';
+    }
+  }
+}
+
+async function loadAnimalSightings() {
+  try {
+    const response = await fetch('/api/sightings');
+    const result = await response.json();
+
+    const sightingsList = document.getElementById('sightings-list');
+    
+    if (result.success && result.data && result.data.length > 0) {
+      // Display only the first 10 sightings
+      const displaySightings = result.data.slice(0, 10);
+      sightingsList.innerHTML = displaySightings.map(sighting => `
+        <div class="p-4 border border-gray-200 rounded-lg hover:shadow-lg transition">
+          <div class="flex justify-between items-start mb-2">
+            <h4 class="font-semibold text-gray-800">${sighting.species?.common_name || 'Unknown Species'}</h4>
+            <span class="text-xs font-medium px-2 py-1 rounded bg-blue-100 text-blue-800">${sighting.species?.category || 'Unknown'}</span>
+          </div>
+          <p class="text-sm text-gray-600 mb-3">${sighting.notes || 'No details provided'}</p>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <span class="text-gray-500"><strong>Location:</strong> ${sighting.location?.city_name || 'Unknown'}</span>
+            <span class="text-gray-500"><strong>Date:</strong> ${new Date(sighting.sighting_date).toLocaleDateString()}</span>
+          </div>
+          <div class="mt-2 text-xs text-gray-400">
+            <strong>Reported by:</strong> ${sighting.observer_name || 'Anonymous'}
+          </div>
+        </div>
+      `).join('');
+    } else {
+      sightingsList.innerHTML = '<p class="text-gray-500 text-center text-sm col-span-full">No animal sightings available</p>';
+    }
+  } catch (error) {
+    console.error('Error loading animal sightings:', error);
+    const sightingsList = document.getElementById('sightings-list');
+    if (sightingsList) {
+      sightingsList.innerHTML = '<p class="text-red-500 text-center text-sm col-span-full">Error loading sightings</p>';
     }
   }
 }

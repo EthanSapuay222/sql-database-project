@@ -126,6 +126,13 @@ document.addEventListener('DOMContentLoaded', function() {
   loadLocations();
   loadSpecies();
   
+  // Set today's date as default for sighting date
+  const today = new Date().toISOString().split('T')[0];
+  const sightingDateInput = document.getElementById('sighting-date');
+  if (sightingDateInput) {
+    sightingDateInput.value = today;
+  }
+  
   // Update status display
   if (userIdDisplay) {
     userIdDisplay.innerHTML = '<span class="font-bold">Status:</span> Form Ready';
@@ -167,10 +174,12 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       
       try {
+        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
         const response = await fetch('/api/reports', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
           },
           body: JSON.stringify(reportData)
         });
@@ -220,9 +229,10 @@ document.addEventListener('DOMContentLoaded', function() {
       const observerName = formData.get('observer-name');
       const observerContact = formData.get('observer-contact');
       const notes = formData.get('sighting-notes');
+      const sightingDate = formData.get('sighting-date');
       
       // Validate required fields
-      if (!speciesId || !locationId || !observerName || !observerContact) {
+      if (!speciesId || !locationId || !observerName || !observerContact || !sightingDate) {
         showMessage('Please fill in all required fields.', 'error');
         return;
       }
@@ -234,7 +244,8 @@ document.addEventListener('DOMContentLoaded', function() {
         number_observed: parseInt(numberObserved) || 1,
         observer_name: observerName,
         observer_contact: observerContact,
-        notes: notes || null
+        notes: notes || null,
+        sighting_date: sightingDate
       };
       
       if (userIdDisplay) {
@@ -242,15 +253,18 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       
       try {
+        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '';
         const response = await fetch('/api/sightings', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
           },
           body: JSON.stringify(sightingData),
         });
         
         const result = await response.json();
+        console.log('Sighting submission response:', result);
         
         if (result.success) {
           showMessage('Animal sighting submitted successfully! Thank you for contributing.', 'success');

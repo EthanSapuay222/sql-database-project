@@ -1,9 +1,25 @@
 from flask import Blueprint, request, jsonify, session
 from datetime import datetime as datetime_module
-from model import User, EnvironmentalReport, ActivityLog
+from model import User, EnvironmentalReport, ActivityLog, Sighting
 from database import db
 
 api_admin = Blueprint('api_admin', __name__, url_prefix='/api/admin')
+
+
+# Debug route
+@api_admin.route('/debug', methods=['GET'])
+def debug_admin():
+    """Debug route to check session and authorization"""
+    return jsonify({
+        'session_data': {
+            'user_id': session.get('user_id'),
+            'username': session.get('username'),
+            'user_role': session.get('user_role'),
+            'is_admin': session.get('user_role') == 'admin'
+        },
+        'request_headers': dict(request.headers),
+        'cookies': dict(request.cookies)
+    })
 
 
 def admin_required(f):
@@ -18,9 +34,12 @@ def admin_required(f):
 
 
 @api_admin.route('/reports', methods=['GET'])
-@admin_required
 def get_admin_reports():
     """Get all environmental reports for admin dashboard"""
+    # Check admin authorization
+    if 'user_id' not in session or session.get('user_role') != 'admin':
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 403
+    
     try:
         reports = db.session.query(EnvironmentalReport).all()
         
@@ -49,9 +68,12 @@ def get_admin_reports():
 
 
 @api_admin.route('/reports/<int:report_id>', methods=['GET'])
-@admin_required
 def get_admin_report(report_id):
     """Get a specific report for editing"""
+    # Check admin authorization
+    if 'user_id' not in session or session.get('user_role') != 'admin':
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 403
+    
     try:
         report = db.session.query(EnvironmentalReport).filter_by(report_id=report_id).first()
         
@@ -74,16 +96,29 @@ def get_admin_report(report_id):
 
 
 @api_admin.route('/reports/<int:report_id>', methods=['PUT'])
-@admin_required
 def update_admin_report(report_id):
     """Update a report"""
+    # Check admin authorization
+    if 'user_id' not in session or session.get('user_role') != 'admin':
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 403
+    
     try:
+        # Debug: Log request details
+        print(f"DEBUG: PUT request to /api/admin/reports/{report_id}")
+        print(f"DEBUG: Content-Type: {request.content_type}")
+        print(f"DEBUG: Raw data: {request.get_data(as_text=True)}")
+        
         report = db.session.query(EnvironmentalReport).filter_by(report_id=report_id).first()
         
         if not report:
             return jsonify({'success': False, 'message': 'Report not found'}), 404
         
-        data = request.get_json()
+        data = request.get_json(force=True, silent=False)
+        print(f"DEBUG: Parsed JSON data: {data}")
+        
+        if not data:
+            print("DEBUG: No data received!")
+            return jsonify({'success': False, 'message': 'No data provided'}), 400
         
         # Update fields
         if 'title' in data:
@@ -118,13 +153,21 @@ def update_admin_report(report_id):
             'message': 'Report updated successfully'
         })
     except Exception as e:
+        db.session.rollback()
         return jsonify({'success': False, 'message': str(e)}), 500
 
 
 @api_admin.route('/reports/<int:report_id>', methods=['DELETE'])
-@admin_required
 def delete_admin_report(report_id):
     """Delete a report"""
+    # Check admin authorization
+    if 'user_id' not in session or session.get('user_role') != 'admin':
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 403
+    
+    print(f"DEBUG DELETE: /api/admin/reports/{report_id}")
+    print(f"DEBUG DELETE: Session user_id: {session.get('user_id')}")
+    print(f"DEBUG DELETE: Session user_role: {session.get('user_role')}")
+    
     try:
         report = db.session.query(EnvironmentalReport).filter_by(report_id=report_id).first()
         
@@ -149,28 +192,35 @@ def delete_admin_report(report_id):
             'message': 'Report deleted successfully'
         })
     except Exception as e:
+        db.session.rollback()
         return jsonify({'success': False, 'message': str(e)}), 500
 
 
 @api_admin.route('/users', methods=['GET'])
-@admin_required
 def get_admin_users():
     """Get all users for admin dashboard"""
+    # Check admin authorization
+    if 'user_id' not in session or session.get('user_role') != 'admin':
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 403
+    
     try:
         users = db.session.query(User).all()
         users_data = [user.to_dict() for user in users]
         return jsonify({
             'success': True,
-            'users': users_data
+            'data': users_data
         })
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
 
 @api_admin.route('/users/<int:user_id>', methods=['DELETE'])
-@admin_required
 def delete_admin_user(user_id):
     """Delete a user - admin only"""
+    # Check admin authorization
+    if 'user_id' not in session or session.get('user_role') != 'admin':
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 403
+    
     try:
         # Prevent admin from deleting themselves
         if user_id == session.get('user_id'):
@@ -204,4 +254,58 @@ def delete_admin_user(user_id):
             'message': f'User {username} deleted successfully'
         })
     except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@api_admin.route('/sightings', methods=['GET'])
+def get_admin_sightings():
+    """Get all animal sightings for admin dashboard"""
+    # Check admin authorization
+    if 'user_id' not in session or session.get('user_role') != 'admin':
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 403
+    
+    try:
+        sightings = db.session.query(Sighting).order_by(Sighting.created_at.desc()).all()
+        sightings_data = [sighting.to_dict() for sighting in sightings]
+        return jsonify({
+            'success': True,
+            'data': sightings_data
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@api_admin.route('/sightings/<int:sighting_id>', methods=['DELETE'])
+def delete_admin_sighting(sighting_id):
+    """Delete an animal sighting - admin only"""
+    # Check admin authorization
+    if 'user_id' not in session or session.get('user_role') != 'admin':
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 403
+    
+    try:
+        sighting = db.session.query(Sighting).filter_by(sighting_id=sighting_id).first()
+        
+        if not sighting:
+            return jsonify({'success': False, 'message': 'Sighting not found'}), 404
+        
+        species_name = sighting.species.common_name if sighting.species else 'Unknown'
+        db.session.delete(sighting)
+        db.session.commit()
+        
+        # Log activity
+        activity = ActivityLog(
+            user_id=session.get('user_id'),
+            action_type='delete_sighting',
+            description=f'Deleted sighting: {species_name}',
+            created_at=datetime_module.now()
+        )
+        db.session.add(activity)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Sighting deleted successfully'
+        })
+    except Exception as e:
+        db.session.rollback()
         return jsonify({'success': False, 'message': str(e)}), 500

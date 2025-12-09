@@ -425,3 +425,97 @@
 .save-button:active {
     transform: scale(0.98);
 }
+
+/* Tab Navigation */
+.admin-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #ddd;
+}
+
+.tab-button {
+    padding: 12px 20px;
+    border: none;
+    background-color: transparent;
+    color: #666;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s;
+}
+
+.tab-button:hover {
+    color: #007bff;
+}
+
+.tab-button.active {
+    color: #007bff;
+    border-bottom-color: #007bff;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-content.hidden {
+    display: none;
+}
+
+/* Sightings and Users Tables */
+.sightings-table,
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+}
+
+.sightings-table thead,
+.users-table thead {
+    background-color: #f9f9f9;
+}
+
+.sightings-table th,
+.users-table th {
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    color: #333;
+    border-bottom: 2px solid #ddd;
+}
+
+.sightings-table td,
+.users-table td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+.sightings-table tbody tr:hover,
+.users-table tbody tr:hover {
+    background-color: #f5f5f5;
+}
+
+.delete-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.delete-btn:hover {
+    background-color: #c82333;
+}
+
+.delete-btn:active {
+    transform: scale(0.95);
+}
+

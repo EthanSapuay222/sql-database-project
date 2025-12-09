@@ -6,11 +6,11 @@ pages = Blueprint('pages', __name__)
 
 @pages.route('/')
 def index():
-    """Homepage - show FP if authenticated, otherwise show login"""
+    """Homepage - show FP if authenticated, otherwise redirect to login"""
     if 'user_id' in session:
         return render_template('FP.html')
     else:
-        return render_template('Login.html')
+        return redirect(url_for('auth.login'))
 
 
 @pages.route('/map')
