@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from model import Sighting
+from model import Sighting, update_species_stats
 from database import db
 from datetime import datetime
 
@@ -78,6 +78,9 @@ def create_sighting():
         db.session.add(new_sighting)
         db.session.commit()
         
+        # Update species statistics after new sighting
+        update_species_stats(data['species_id'])
+        
         return jsonify({
             'success': True,
             'message': 'Sighting submitted successfully',
@@ -107,6 +110,9 @@ def update_sighting_status(sighting_id):
             
             sighting.verification_status = data['verification_status']
             db.session.commit()
+            
+            # Update species statistics when verification status changes
+            update_species_stats(sighting.species_id)
             
             return jsonify({
                 'success': True,

@@ -1,0 +1,5 @@
+[
+  {"name":"Pollution","description":"Air, water, soil, or noise pollution"},
+  {"name":"Deforestation","description":"Illegal or unauthorized forest clearing"},
+  {"name":"Waste Dumping","description":"Illegal waste disposal"}
+]

@@ -3,18 +3,30 @@
 {% block title %}EcoTrack - Admin Login{% endblock %}
 
 {% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/FP.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
 {% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center">
-    <div class="w-full max-w-md bg-white rounded-lg shadow-lg overflow-hidden">
-        <div class="bg-gradient-to-r from-blue-600 to-green-600 px-6 py-8 text-white text-center">
-            <h2 class="text-2xl font-bold mb-1">Admin Portal</h2>
-            <p class="text-sm">Restricted access - Admins only</p>
+<div id="app-container" class="min-h-screen flex flex-col" style="background: #fff;">
+    <header style="background: #104F17; border-bottom: 4px solid var(--accent); color: white;" class="p-4 flex justify-between items-center shadow-lg">
+        <div class="flex items-center space-x-3">
+            <div style="background: var(--secondary); border: 2px solid var(--accent);" class="w-10 h-10 rounded-full flex items-center justify-center">
+                <img src="{{ url_for('static', filename='img/EcotrackLogo.png') }}" class="w-full h-full object-cover rounded-full" alt="EcoTrack Logo" />
+            </div>
+            <span style="color: white;" class="font-extrabold text-2xl tracking-wider">EcoTrack</span>
         </div>
+        <!-- intentionally no home link -->
+    </header>
 
-        <div class="px-6 py-8">
+    <div class="flex-1 flex items-center justify-center">
+        <div class="w-full max-w-md bg-white rounded-lg shadow-lg overflow-hidden">
+            <div style="background: #4B872B; color: #fff;" class="px-6 py-8 text-white text-center">
+                <h2 class="text-2xl font-bold mb-1">Admin Portal</h2>
+                <p class="text-sm">Restricted access - Admins only</p>
+            </div>
+
+            <div class="px-6 py-8">
             {% with messages = get_flashed_messages(category_filter=['admin_error']) %}
                 {% if messages %}
                     {% for message in messages %}

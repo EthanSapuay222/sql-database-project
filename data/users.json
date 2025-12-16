@@ -1,0 +1,4 @@
+[
+  {"username":"admin","full_name":"Administrator","user_role":"admin","is_active":true},
+  {"username":"jsantos","full_name":"Jose Santos","user_role":"public","is_active":true}
+]

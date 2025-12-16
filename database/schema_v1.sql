@@ -23,10 +23,11 @@ DROP TYPE IF EXISTS user_role_type CASCADE;
 CREATE TYPE category_type AS ENUM ('land', 'water');
 CREATE TYPE status_trend_type AS ENUM ('stable', 'increasing', 'decreasing', 'unknown');
 CREATE TYPE location_type_enum AS ENUM ('city', 'municipality');
-CREATE TYPE severity_type AS ENUM ('Critical', 'High', 'Medium', 'Low', 'Informational', 'Warning', 'Emergency', 'Negligible', 'Severe', 'Unknown', 'Localized', 'Widespread', 'Temporary', 'Persistent', 'Recovering', 'Escalating', 'Contained', 'Unverified', 'Catastrophic', 'Resolve');
+-- Keep severity enum aligned with the application model (4 levels, low->critical)
+CREATE TYPE severity_type AS ENUM ('Low', 'Medium', 'High', 'Critical');
 CREATE TYPE verification_type AS ENUM ('pending', 'verified', 'rejected');
-CREATE TYPE report_type_enum AS ENUM ('pollution', 'deforestation', 'waste_dumping', 'wildlife_incident', 'air_quality_alert', 'chemical_spill', 'habitat_destruction', 'noise_disturbance', 'plastic_pollution', 'illegal_mining', 'urban_encroachment', 'water_contamination', 'invasive_species', 'climate_anomaly', 'oil leak', 'radiation exposure', 'coral bleaching', 'overfishing', 'illegal logging',
-'other');
+-- Restrict report types to the categories used in the application model
+CREATE TYPE report_type_enum AS ENUM ('pollution', 'deforestation', 'waste_dumping', 'wildlife_incident', 'other');
 CREATE TYPE report_status_type AS ENUM ('pending', 'in_progress', 'completed', 'closed');
 CREATE TYPE user_role_type AS ENUM ('admin', 'public');
 
@@ -77,7 +78,7 @@ CREATE TABLE sightings (
     sighting_id SERIAL PRIMARY KEY,
     species_id INT NOT NULL,
     location_id INT NOT NULL,
-    sighting_date DATE NOT NULL,
+    sighting_date DATE NOT NULL DEFAULT CURRENT_DATE,
     number_observed INT DEFAULT 1,
     observer_name VARCHAR(100),
     observer_contact VARCHAR(100),
@@ -305,27 +306,10 @@ INSERT INTO report_categories (name, description) VALUES
 ('Climate Anomaly', 'Unusual weather patterns affecting ecosystems'),
 ('Other', 'Other environmental concerns');
 
--- INSERT DATA: REPORT_SEVERITY (4 records)
 INSERT INTO report_severity (level, description) VALUES
 ('Low', 'Minor environmental impact, non-urgent'),
 ('Medium', 'Moderate impact, should be addressed soon'),
 ('High', 'Significant impact, requires prompt action'),
-('Informational', 'General observation, no immediate action needed'),
-('Warning', 'Potential risk, monitor closely'),
-('Emergency', 'Immediate danger, requires rapid response'),
-('Negligible', 'Minimal concern, unlikely to escalate'),
-('Severe', 'Major disruption or damage reported'),
-('Unknown', 'Severity not yet assessed'),
-('Localized', 'Impact confined to a small area'),
-('Widespread', 'Impact affecting multiple regions'),
-('Temporary', 'Short-term issue expected to resolve'),
-('Persistent', 'Ongoing issue requiring long-term monitoring'),
-('Recovering', 'Situation improving but still under observation'),
-('Escalating', 'Issue worsening over time'),
-('Contained', 'Issue under control, no further spread'),
-('Unverified', 'Reported but not yet confirmed'),
-('Catastrophic', 'Massive damage with long-term consequences'),
-('Resolved', 'Issue addressed and closed'),
 ('Critical', 'Severe impact, immediate action required');
 
 -- INSERT DATA: USERS (2 records)
@@ -354,6 +338,7 @@ INSERT INTO users (username, password, full_name, user_role, is_active) VALUES
 
 -- INSERT DATA: ENVIRONMENTAL_REPORTS (20 records)
 INSERT INTO environmental_reports (location_id, report_type, severity, status, title, description, reporter_name, reporter_contact, report_date) VALUES
+-- Normalized report_type values to match the report_type_enum (pollution/deforestation/waste_dumping/wildlife_incident/other)
 (5, 'pollution', 'Critical', 'pending', 'Illegal Waste Dumping at Batangas City Port', 'Large amounts of industrial waste found dumped near the port area. Immediate cleanup required.', 'Juan Dela Cruz', 'juan@email.com', '2025-12-01'),
 (25, 'deforestation', 'High', 'in_progress', 'Deforestation in Taal Watershed', 'Unauthorized tree cutting observed in the protected watershed area.', 'Maria Santos', 'maria@email.com', '2025-12-07'),
 (16, 'pollution', 'High', 'pending', 'Plastic Pollution at Nasugbu Beach', 'Excessive plastic waste accumulating along the shoreline, affecting marine life.', 'Pedro Reyes', '09123456789', '2025-12-07'),
@@ -364,16 +349,16 @@ INSERT INTO environmental_reports (location_id, report_type, severity, status, t
 (20, 'wildlife_incident', 'Medium', 'pending', 'Injured Sea Turtle Found', 'Sea turtle found with fishing net entanglement on the beach.', 'Elena Flores', 'elena@email.com', '2025-12-06'),
 (13, 'deforestation', 'Critical', 'in_progress', 'Mangrove Area Being Cleared', 'Illegal clearing of protected mangrove forest for fish pond development.', 'Roberto Santos', '09176543210', '2025-12-02'),
 (10, 'other', 'Low', 'completed', 'Noise Pollution from Construction', 'Extended construction hours causing disturbance to wildlife in nearby area.', 'Carmen Reyes', 'carmen@email.com', '2025-11-15'),
-(11, 'urban_encroachment', 'Medium', 'pending', 'Construction Near Protected Forest', 'Buildings encroaching on forest boundary', 'Kyle Mercado', 'kyle@example.com', '2025-11-11'),
-(12, 'water_contamination', 'High', 'in_progress', 'Contaminated Well in Taysan', 'Water tests show high toxicity', 'Lia Villanueva', 'lia@example.com', '2025-11-12'),
-(13, 'invasive_species', 'Medium', 'pending', 'Invasive Plant in Mataasnakahoy', 'Non-native plant spreading rapidly', 'Mia Aquino', 'mia@example.com', '2025-11-13'),
-(14, 'climate_anomaly', 'Informational', 'closed', 'Unusual Rainfall in Rosario', 'Rainfall patterns deviating from norm', 'Nico Dela Cruz', 'nico@example.com', '2025-11-14'),
+(11, 'other', 'Medium', 'pending', 'Construction Near Protected Forest', 'Buildings encroaching on forest boundary', 'Kyle Mercado', 'kyle@example.com', '2025-11-11'),
+(12, 'pollution', 'High', 'in_progress', 'Contaminated Well in Taysan', 'Water tests show high toxicity', 'Lia Villanueva', 'lia@example.com', '2025-11-12'),
+(13, 'other', 'Medium', 'pending', 'Invasive Plant in Mataasnakahoy', 'Non-native plant spreading rapidly', 'Mia Aquino', 'mia@example.com', '2025-11-13'),
+(14, 'other', 'Low', 'closed', 'Unusual Rainfall in Rosario', 'Rainfall patterns deviating from norm', 'Nico Dela Cruz', 'nico@example.com', '2025-11-14'),
 (15, 'wildlife_incident', 'Medium', 'pending', 'Stranded Dolphin in Balayan', 'Dolphin found stranded on shore', 'Olive Ramos', 'olive@example.com', '2025-11-15'),
 (16, 'pollution', 'Critical', 'in_progress', 'Toxic Smoke in Malvar', 'Factory emitting toxic fumes', 'Pauline Garcia', 'pauline@example.com', '2025-11-16'),
 (17, 'deforestation', 'High', 'pending', 'Tree Cutting in Laurel Highlands', 'Forest clearing for road expansion', 'Quinn Lopez', 'quinn@example.com', '2025-11-17'),
 (18, 'waste_dumping', 'Medium', 'pending', 'Garbage Pile in San Pascual', 'Uncollected garbage causing odor', 'Rico Tan', 'rico@example.com', '2025-11-18'),
-(19, 'chemical_spill', 'Critical', 'in_progress', 'Toxic Spill in Tanauan River', 'Chemical waste leaking into river', 'Sofia Lim', 'sofia@example.com', '2025-11-19'),
-(20, 'air_quality_alert', 'Medium', 'closed', 'Dust Storm in Padre Garcia', 'Strong winds carrying dust', 'Troy Santos', 'troy@example.com', '2025-11-20');
+(19, 'pollution', 'Critical', 'in_progress', 'Toxic Spill in Tanauan River', 'Chemical waste leaking into river', 'Sofia Lim', 'sofia@example.com', '2025-11-19'),
+(20, 'pollution', 'Medium', 'closed', 'Dust Storm in Padre Garcia', 'Strong winds carrying dust', 'Troy Santos', 'troy@example.com', '2025-11-20');
 
 -- INSERT DATA: SIGHTINGS (20 records)
 INSERT INTO sightings (species_id, location_id, sighting_date, number_observed, observer_name, observer_contact, verification_status, notes) VALUES

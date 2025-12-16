@@ -1,0 +1,12 @@
+[
+  {"city_name":"Batangas City","location_type":"city","latitude":13.7565,"longitude":121.0583,"severity_level":"Critical","total_reports":3},
+  {"city_name":"Calaca","location_type":"city","latitude":13.9167,"longitude":120.8167,"severity_level":"Low","total_reports":1},
+  {"city_name":"Lipa City","location_type":"city","latitude":13.9411,"longitude":121.1622,"severity_level":"High","total_reports":2},
+  {"city_name":"Santo Tomas","location_type":"city","latitude":14.1078,"longitude":121.1414,"severity_level":"Medium","total_reports":1},
+  {"city_name":"Tanauan City","location_type":"city","latitude":14.0858,"longitude":121.15,"severity_level":"Critical","total_reports":4},
+  {"city_name":"Agoncillo","location_type":"municipality","latitude":13.9333,"longitude":120.9333,"severity_level":"Low","total_reports":0},
+  {"city_name":"Alitagtag","location_type":"municipality","latitude":13.8667,"longitude":121.0,"severity_level":"Low","total_reports":0},
+  {"city_name":"Balayan","location_type":"municipality","latitude":13.9389,"longitude":120.7333,"severity_level":"Medium","total_reports":2},
+  {"city_name":"Balete","location_type":"municipality","latitude":13.9833,"longitude":121.1,"severity_level":"Low","total_reports":0},
+  {"city_name":"Bauan","location_type":"municipality","latitude":13.7917,"longitude":121.0089,"severity_level":"High","total_reports":2}
+]

@@ -4,15 +4,16 @@
 
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/FP.css') }}" />
+<link rel="stylesheet" href="{{ url_for('static', filename='css/about.css') }}" />
 {% endblock %}
 
 {% block content %}
 <body class="min-h-screen antialiased">
-    <header class="bg-white shadow-lg sticky top-0 z-10">
+    <header style="background: #104F17; border-bottom: 4px solid var(--accent); color: white;" class="p-4 flex justify-between items-center shadow-lg">
       <div
         class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center"
       >
-        <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">
+        <h1 class="text-3xl font-extrabold text-white tracking-tight">
           Sustainable Development Goals
         </h1>
         <nav class="hidden md:block">
@@ -179,3 +180,11 @@
 {% endblock %}
 
 {% block scripts %}{% endblock %}
+
+<footer style="background: #104F17; color: #fff;">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center">
+    <p class="text-sm text-white">
+      &copy; 2023 Group 5. All rights reserved.
+    </p>
+  </div>
+</footer>

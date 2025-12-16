@@ -1,5 +1,5 @@
 from database import db  # Import db from database.py
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 
@@ -26,7 +26,88 @@ class Species(db.Model):
     # Relationships
     sightings = db.relationship('Sighting', backref='species', lazy=True, cascade='all, delete-orphan')
     
+    def update_statistics(self):
+        """Update species statistics based on verified sightings"""
+        from sqlalchemy import func
+        
+        # Get verified sightings for this species
+        verified_sightings = Sighting.query.filter_by(
+            species_id=self.species_id,
+            verification_status='verified'
+        ).all()
+        
+        # Calculate total observed count
+        total_observed = sum(s.number_observed or 1 for s in verified_sightings)
+        
+        # Update total sightings estimate
+        if total_observed > 0:
+            self.total_sightings_estimate = str(total_observed)
+        else:
+            self.total_sightings_estimate = 'No verified sightings'
+        
+        # Calculate population trend based on recent vs older sightings
+        self._calculate_trend()
+        
+        self.updated_at = datetime.utcnow()
+    
+    def _calculate_trend(self):
+        """Calculate population trend based on sighting patterns"""
+        from sqlalchemy import func
+        
+        now = datetime.utcnow().date()
+        thirty_days_ago = now - timedelta(days=30)
+        sixty_days_ago = now - timedelta(days=60)
+        
+        # Count verified sightings in recent period (last 30 days)
+        recent_sightings = Sighting.query.filter(
+            Sighting.species_id == self.species_id,
+            Sighting.verification_status == 'verified',
+            Sighting.sighting_date >= thirty_days_ago
+        ).count()
+        
+        # Count verified sightings in previous period (30-60 days ago)
+        previous_sightings = Sighting.query.filter(
+            Sighting.species_id == self.species_id,
+            Sighting.verification_status == 'verified',
+            Sighting.sighting_date >= sixty_days_ago,
+            Sighting.sighting_date < thirty_days_ago
+        ).count()
+        
+        # Determine trend
+        if recent_sightings == 0 and previous_sightings == 0:
+            self.status_trend = 'unknown'
+        elif recent_sightings > previous_sightings:
+            self.status_trend = 'increasing'
+        elif recent_sightings < previous_sightings:
+            self.status_trend = 'decreasing'
+        else:
+            self.status_trend = 'stable'
+    
+    def get_verified_sighting_count(self):
+        """Get the count of verified sightings for this species"""
+        return Sighting.query.filter_by(
+            species_id=self.species_id,
+            verification_status='verified'
+        ).count()
+    
+    def get_total_observed(self):
+        """Get total number of animals observed from verified sightings"""
+        verified_sightings = Sighting.query.filter_by(
+            species_id=self.species_id,
+            verification_status='verified'
+        ).all()
+        return sum(s.number_observed or 1 for s in verified_sightings)
+    
     def to_dict(self):
+        verified_count = self.get_verified_sighting_count()
+        total_observed = self.get_total_observed()
+        
+        # Dynamic sightings estimate based on actual data
+        if verified_count > 0:
+            sightings_display = f"{total_observed} observed ({verified_count} sightings)"
+        else:
+            sightings_display = self.total_sightings_estimate or 'No verified sightings'
+        
         return {
             'species_id': self.species_id,
             'common_name': self.common_name,
@@ -35,7 +116,9 @@ class Species(db.Model):
             'species_type': self.species_type,
             'conservation_status': self.conservation_status,
             'status_trend': self.status_trend,
-            'total_sightings_estimate': self.total_sightings_estimate,
+            'total_sightings_estimate': sightings_display,
+            'verified_sighting_count': verified_count,
+            'total_observed': total_observed,
             'description': self.description,
             'habitat_info': self.habitat_info,
             'diet_info': self.diet_info,
@@ -44,6 +127,17 @@ class Species(db.Model):
     
     def __repr__(self):
         return f'<Species {self.common_name}>'
+
+
+# Helper function to update species statistics
+def update_species_stats(species_id):
+    """Update statistics for a specific species"""
+    species = Species.query.get(species_id)
+    if species:
+        species.update_statistics()
+        db.session.commit()
+        return True
+    return False
 
 
 # REPORT CATEGORY MODEL
@@ -98,7 +192,7 @@ class Location(db.Model):
     location_type = db.Column(db.Enum('city', 'municipality'), nullable=False)
     latitude = db.Column(db.Numeric(10, 7), nullable=False)
     longitude = db.Column(db.Numeric(10, 7), nullable=False)
-    severity_level = db.Column(db.Enum('Critical', 'High', 'Medium', 'Low'), nullable=False)
+    severity_level = db.Column(db.Enum('Low', 'Medium', 'High', 'Critical'), nullable=False)
     total_reports = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -166,7 +260,7 @@ class EnvironmentalReport(db.Model):
     report_id = db.Column(db.Integer, primary_key=True)
     location_id = db.Column(db.Integer, db.ForeignKey('locations.location_id'), nullable=False)
     report_type = db.Column(db.Enum('pollution', 'deforestation', 'waste_dumping', 'wildlife_incident', 'other'), nullable=False)
-    severity = db.Column(db.Enum('Critical', 'High', 'Medium', 'Low'), nullable=False)
+    severity = db.Column(db.Enum('Low', 'Medium', 'High', 'Critical'), nullable=False)
     status = db.Column(db.Enum('pending', 'in_progress', 'completed', 'closed'), default='pending')
     title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text, nullable=False)

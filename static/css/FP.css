@@ -30,12 +30,14 @@ body {
 }
 /* Para to sa View Life on Land And Water*/
 :root {
-  --primary: #2c5530;
-  --secondary: #2c6f2c;
-  --accent: #8fb996;
-  --light: #e8f4ea;
-  --text: #333333;
-  --highlight: #d4af37;
+  --primary: #4B872B;      /* Main header/footer, strong accent */
+  --secondary: #fff;       /* Sidebar, secondary backgrounds, buttons now white */
+  --accent: #fff;          /* Card backgrounds, highlights now white */
+  --light: #fff;           /* Light background now white */
+  --text: #104F17;         /* Deep green for text */
+  --highlight: #78A33D;    /* Main buttons, nav, accents */
+  --dark: #083316;         /* For footer, header, or backgrounds */
+  --hover: #266B1C;        /* For hover states */
 }
 
 * {

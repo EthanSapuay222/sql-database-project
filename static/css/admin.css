@@ -180,6 +180,16 @@
     color: white;
 }
 
+.status-badge.verified {
+    background-color: #28a745;
+    color: white;
+}
+
+.status-badge.rejected {
+    background-color: #dc3545;
+    color: white;
+}
+
 .action-buttons {
     display: flex;
     gap: 5px;
@@ -189,6 +199,42 @@
 .action-buttons button {
     font-size: 11px;
     padding: 5px 8px;
+}
+
+.verify-btn {
+    background-color: #28a745 !important;
+    color: white;
+}
+
+.verify-btn:hover {
+    background-color: #1e7e34 !important;
+}
+
+.pending-btn {
+    background-color: #ffc107 !important;
+    color: #333;
+}
+
+.pending-btn:hover {
+    background-color: #e0a800 !important;
+}
+
+.reject-btn {
+    background-color: #dc3545 !important;
+    color: white;
+}
+
+.reject-btn:hover {
+    background-color: #c82333 !important;
+}
+
+.delete-btn {
+    background-color: #6c757d !important;
+    color: white;
+}
+
+.delete-btn:hover {
+    background-color: #545b62 !important;
 }
 
 /* Edit Section */

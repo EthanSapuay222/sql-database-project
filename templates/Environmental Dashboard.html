@@ -5,31 +5,11 @@
 {% block head %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}" />
-<script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        colors: {
-          "brand-header": "#af8f6e",
-          "brand-card": "#6d824d",
-          "brand-background-left": "#ffffff",
-          "brand-background-right": "#f3f4e1",
-          "brand-accent": "#6dd9e8",
-        },
-        fontFamily: {
-          sans: ["Inter", "sans-serif"],
-        },
-      },
-    },
-  };
-</script>
 {% endblock %}
 
 {% block content %}
-<body class="min-h-screen">
-    <header
-      class="h-20 bg-brand-header text-white flex items-center justify-between p-4 shadow-lg"
-    >
+<body class="min-h-screen" style="background: #fff;">
+    <header style="background: #104F17; border-bottom: 4px solid var(--accent); color: white;" class="p-4 flex justify-between items-center shadow-lg">
       <a href="{{ url_for('pages.index') }}" class="flex items-center space-x-4 cursor-pointer">
         <div
           class="h-10 w-10 bg-white rounded-full flex items-center justify-center overflow-hidden border-2 border-white"
@@ -40,7 +20,7 @@
             class="w-full h-full object-cover rounded-full"
           />
         </div>
-        <span id="logo-text" class="text-xl font-semibold text-gray-800"
+        <span id="logo-text" class="text-xl font-semibold text-white"
           >EcoTrack</span
         >
       </a>
@@ -69,27 +49,19 @@
         </div>
 
         <div class="grid grid-cols-2 gap-4 mb-10">
-          <div
-            class="p-4 rounded-lg shadow-md bg-brand-card text-white text-center"
-          >
+          <div class="p-4 rounded-lg shadow-md bg-brand-card text-black text-center">
             <div class="text-sm font-light opacity-80">Total Reports:</div>
             <div class="text-3xl font-extrabold">5</div>
           </div>
-          <div
-            class="p-4 rounded-lg shadow-md bg-brand-card text-white text-center"
-          >
+          <div class="p-4 rounded-lg shadow-md bg-brand-card text-black text-center">
             <div class="text-sm font-light opacity-80">Pending:</div>
             <div class="text-3xl font-extrabold">3</div>
           </div>
-          <div
-            class="p-4 rounded-lg shadow-md bg-brand-card text-white text-center"
-          >
+          <div class="p-4 rounded-lg shadow-md bg-brand-card text-black text-center">
             <div class="text-sm font-light opacity-80">Completed:</div>
             <div class="text-3xl font-extrabold">1</div>
           </div>
-          <div
-            class="p-4 rounded-lg shadow-md bg-brand-card text-white text-center"
-          >
+          <div class="p-4 rounded-lg shadow-md bg-brand-card text-black text-center">
             <div class="text-sm font-light opacity-80">Critical:</div>
             <div class="text-3xl font-extrabold">1</div>
           </div>
@@ -141,6 +113,23 @@
         </div>
       </div>
     </section>
+
+    <footer style="background: #104F17; color: #fff;">
+      <div class="max-w-7xl mx-auto py-4 px-8">
+        <div class="flex flex-col md:flex-row items-center justify-between">
+          <div class="text-center md:text-left">
+            <p class="text-sm">
+              &copy; 2023 EcoTrack. All rights reserved.
+            </p>
+          </div>
+          <div class="mt-2 md:mt-0">
+            <a href="#" class="text-sm hover:underline">Privacy Policy</a>
+            <span class="text-gray-500 mx-2">|</span>
+            <a href="#" class="text-sm hover:underline">Terms of Service</a>
+          </div>
+        </div>
+      </div>
+    </footer>
 </body>
 {% endblock %}
 

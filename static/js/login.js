@@ -36,9 +36,8 @@ function switchTab(tabName) {
     }
 }
 
-/**
- * Initialize login page
- */
+//Initialize login page
+
 document.addEventListener('DOMContentLoaded', function() {
     // Handle registration form submission
     const registerForm = document.getElementById('register-form');

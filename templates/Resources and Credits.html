@@ -4,23 +4,12 @@
 
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/resources-credits.css') }}" />
-<script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        colors: {
-          "custom-tan": "#D9A779",
-        },
-      },
-    },
-  };
-</script>
 {% endblock %}
 
 {% block content %}
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col" style="background: #fff;">
     <!-- Top Navigation/Header Banner -->
-    <header class="header-bg shadow-lg p-4">
+    <header style="background: #104F17; border-bottom: 4px solid var(--accent); color: white;" class="p-4 flex justify-between items-center shadow-lg">
       <div
         class="max-w-7xl mx-auto flex justify-between items-center px-4 sm:px-6 lg:px-8"
       >
@@ -47,7 +36,7 @@
               clip-rule="evenodd"
             ></path>
           </svg>
-          <span class="text-xl font-bold text-gray-800">EcoTrack</span>
+          <span class="text-xl font-bold text-white">EcoTrack</span>
         </div>
 
         <!-- Placeholder for alignment -->
@@ -423,6 +412,38 @@ Greater musky fruit bat - Facts, Diet, Habitat & Pictures on Animalia.bio</a
         </div>
       </div>
     </main>
+  <footer style="background: #104F17; color: #fff;">
+    <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col sm:flex-row justify-between items-center">
+        <div class="flex space-x-4 mb-2 sm:mb-0">
+          <!-- Social Media Links (placeholders) -->
+          <a href="#" class="text-white hover:text-gray-300 transition duration-150 ease-in-out">
+            <!-- Facebook Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 2a2 2 0 012 2v16a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2h12z" />
+            </svg>
+          </a>
+          <a href="#" class="text-white hover:text-gray-300 transition duration-150 ease-in-out">
+            <!-- Twitter Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7.55 20.45A10.97 10.97 0 0012 22c6.627 0 12-5.373 12-12S18.627 0 12 0 0 5.373 0 12c0 2.627.897 5.073 2.415 7.055m15.18-4.18a8.963 8.963 0 001.415-4.875C19.99 7.343 16.657 4 12 4c-1.657 0-3.165.5-4.415 1.345m8.83 8.83A8.963 8.963 0 0012 20c-4.418 0-8-3.582-8-8 0-1.657.5-3.165 1.345-4.415" />
+            </svg>
+          </a>
+          <a href="#" class="text-white hover:text-gray-300 transition duration-150 ease-in-out">
+            <!-- Instagram Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8a6 6 0 10-8 0 6 6 0 008 0zM2.458 12C3.732 7.943 7.686 4 12 4c4.314 0 8.268 3.943 9.542 8 1.274 4.057-.732 8-4.542 8-1.657 0-3.215-.5-4.542-1.415M12 15.586a3.586 3.586 0 110-7.172 3.586 3.586 0 010 7.172z" />
+            </svg>
+          </a>
+        </div>
+        <div class="text-center sm:text-right">
+          <p class="text-sm">
+            &copy; 2024 EcoTrack. All rights reserved.
+          </p>
+        </div>
+      </div>
+    </div>
+  </footer>
 {% endblock %}
 
 {% block scripts %}{% endblock %}

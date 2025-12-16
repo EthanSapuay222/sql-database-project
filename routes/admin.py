@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, session
 from datetime import datetime as datetime_module
-from model import User, EnvironmentalReport, ActivityLog, Sighting
+from model import User, EnvironmentalReport, ActivityLog, Sighting, Species, update_species_stats
 from database import db
 
 api_admin = Blueprint('api_admin', __name__, url_prefix='/api/admin')
@@ -288,9 +288,14 @@ def delete_admin_sighting(sighting_id):
         if not sighting:
             return jsonify({'success': False, 'message': 'Sighting not found'}), 404
         
+        species_id = sighting.species_id  # Store species_id before deletion
         species_name = sighting.species.common_name if sighting.species else 'Unknown'
+        
         db.session.delete(sighting)
         db.session.commit()
+        
+        # Update species statistics after deletion
+        update_species_stats(species_id)
         
         # Log activity
         activity = ActivityLog(
@@ -305,6 +310,88 @@ def delete_admin_sighting(sighting_id):
         return jsonify({
             'success': True,
             'message': 'Sighting deleted successfully'
+        })
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@api_admin.route('/species/refresh-stats', methods=['POST'])
+def refresh_all_species_stats():
+    """Refresh statistics for all species - admin only"""
+    # Check admin authorization
+    if 'user_id' not in session or session.get('user_role') != 'admin':
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 403
+    
+    try:
+        species_list = Species.query.all()
+        updated_count = 0
+        
+        for species in species_list:
+            species.update_statistics()
+            updated_count += 1
+        
+        db.session.commit()
+        
+        # Log activity
+        activity = ActivityLog(
+            user_id=session.get('user_id'),
+            action_type='refresh_stats',
+            description=f'Refreshed statistics for {updated_count} species',
+            created_at=datetime_module.now()
+        )
+        db.session.add(activity)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': f'Statistics refreshed for {updated_count} species'
+        })
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@api_admin.route('/sightings/<int:sighting_id>/verify', methods=['PUT'])
+def verify_sighting(sighting_id):
+    """Verify or reject a sighting - admin only"""
+    # Check admin authorization
+    if 'user_id' not in session or session.get('user_role') != 'admin':
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 403
+    
+    try:
+        sighting = db.session.query(Sighting).filter_by(sighting_id=sighting_id).first()
+        
+        if not sighting:
+            return jsonify({'success': False, 'message': 'Sighting not found'}), 404
+        
+        data = request.get_json()
+        new_status = data.get('status')
+        
+        if new_status not in ['verified', 'rejected', 'pending']:
+            return jsonify({'success': False, 'message': 'Invalid status'}), 400
+        
+        old_status = sighting.verification_status
+        sighting.verification_status = new_status
+        db.session.commit()
+        
+        # Update species statistics when verification status changes
+        update_species_stats(sighting.species_id)
+        
+        # Log activity
+        species_name = sighting.species.common_name if sighting.species else 'Unknown'
+        activity = ActivityLog(
+            user_id=session.get('user_id'),
+            action_type='verify_sighting',
+            description=f'Changed sighting #{sighting_id} ({species_name}) from {old_status} to {new_status}',
+            created_at=datetime_module.now()
+        )
+        db.session.add(activity)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': f'Sighting {new_status} successfully'
         })
     except Exception as e:
         db.session.rollback()

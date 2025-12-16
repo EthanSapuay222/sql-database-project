@@ -346,18 +346,73 @@ function displaySightings(sightings) {
     }
     
     tbody.innerHTML = sightings.map(sighting => `
-        <tr>
+        <tr id="sighting-row-${sighting.sighting_id}">
             <td>${sighting.sighting_id}</td>
             <td>${sighting.species?.common_name || 'Unknown'}</td>
             <td>${sighting.location?.city_name || 'Unknown'}</td>
             <td>${sighting.observer_name || 'N/A'}</td>
             <td>${new Date(sighting.sighting_date).toLocaleDateString()}</td>
-            <td>${sighting.verification_status || 'pending'}</td>
             <td>
-                <button class="delete-btn" onclick="deleteSighting(${sighting.sighting_id})">Delete</button>
+                <span id="sighting-status-${sighting.sighting_id}" class="status-badge ${sighting.verification_status || 'pending'}">
+                    ${(sighting.verification_status || 'pending').toUpperCase()}
+                </span>
+            </td>
+            <td>
+                <div class="action-buttons">
+                    ${getSightingStatusButtons(sighting.sighting_id, sighting.verification_status || 'pending')}
+                    <button class="delete-btn" onclick="deleteSighting(${sighting.sighting_id})">Delete</button>
+                </div>
             </td>
         </tr>
     `).join('');
+}
+
+function getSightingStatusButtons(sightingId, currentStatus) {
+    let buttons = '';
+    
+    if (currentStatus !== 'verified') {
+        buttons += `<button class="verify-btn" onclick="changeSightingStatus(${sightingId}, 'verified')">Verify</button>`;
+    }
+    if (currentStatus !== 'pending') {
+        buttons += `<button class="pending-btn" onclick="changeSightingStatus(${sightingId}, 'pending')">Pending</button>`;
+    }
+    if (currentStatus !== 'rejected') {
+        buttons += `<button class="reject-btn" onclick="changeSightingStatus(${sightingId}, 'rejected')">Reject</button>`;
+    }
+    
+    return buttons;
+}
+
+function changeSightingStatus(sightingId, newStatus) {
+    fetch(`/api/admin/sightings/${sightingId}/verify`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({ status: newStatus })
+    })
+    .then(response => {
+        if (!response.ok) {
+            if (response.status === 403) {
+                throw new Error('You are not authorized.');
+            }
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            showSuccessMessage(`Sighting ${newStatus} successfully!`);
+            loadSightings(); // Reload to update stats and display
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error changing sighting status:', error);
+        alert('Error: ' + error.message);
+    });
 }
 
 function updateSightingStats(sightings) {

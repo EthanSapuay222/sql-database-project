@@ -1,0 +1,4 @@
+[
+  {"common_name":"Philippine Duck","scientific_name":"Anas luzonica","category":"land","species_type":"bird","conservation_status":"Least Concern","status_trend":"stable","total_sightings_estimate":"15000-30000"},
+  {"common_name":"Whale Shark","scientific_name":"Rhincodon typus","category":"water","species_type":"fish","conservation_status":"Endangered","status_trend":"decreasing","total_sightings_estimate":"Unknown"}
+]

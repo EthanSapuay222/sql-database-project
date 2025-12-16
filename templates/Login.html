@@ -3,41 +3,40 @@
 {% block title %}EcoTrack - Login{% endblock %}
 
 {% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/FP.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
 {% endblock %}
 
 {% block content %}
-    <div class="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex flex-col">
-        <!-- Navigation Bar -->
-        <nav class="bg-white shadow-md">
-            <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-                <div class="flex items-center space-x-2">
-                    <h1 class="text-2xl font-bold text-green-600">EcoTrack</h1>
-                    <p class="text-sm text-gray-600">Environmental Tracker</p>
+        <div id="app-container" class="min-h-screen flex flex-col">
+            <header class="site-header p-4 flex justify-between items-center shadow-lg">
+                <div class="flex items-center space-x-3">
+                    <div class="site-logo-circle w-10 h-10 rounded-full flex items-center justify-center">
+                        <img src="{{ url_for('static', filename='img/EcotrackLogo.png') }}" class="w-full h-full object-cover rounded-full" alt="EcoTrack Logo" />
+                    </div>
+                    <span class="site-title font-extrabold text-2xl tracking-wider">EcoTrack</span>
                 </div>
-            </div>
-        </nav>
+            </header>
 
-        <!-- Main Container -->
-        <div class="flex-1 flex justify-center items-center px-4 py-12">
-            <div class="w-full max-w-md bg-white rounded-lg shadow-lg overflow-hidden">
-                <!-- Header -->
-                <div class="bg-gradient-to-r from-green-500 to-blue-500 px-6 py-8 text-white text-center">
-                    <h2 class="text-3xl font-bold mb-2">Welcome to EcoTrack</h2>
-                    <p class="text-green-50">Environmental Awareness & Progress Tracker for Batangas</p>
-                </div>
+            <div class="flex-1 flex justify-center items-center px-4 py-12">
+                <div class="w-full max-w-md bg-white rounded-lg shadow-lg overflow-hidden">
+                    <!-- Header -->
+                    <div class="card-header--green px-6 py-8 text-white text-center">
+                        <h2 class="text-3xl font-bold mb-2">Welcome to EcoTrack</h2>
+                        <p class="text-green-50">Environmental Awareness & Progress Tracker for Batangas</p>
+                    </div>
 
                 <!-- Tab Navigation -->
                 <div class="flex border-b bg-gray-50">
                     <button 
                         class="tab-button flex-1 py-4 px-4 font-semibold text-gray-700 border-b-2 border-green-500 active" 
-                        onclick="switchTab('user-login')"
+                        data-tab="user-login"
                     >
                         User Login
                     </button>
                     <button 
                         class="tab-button flex-1 py-4 px-4 font-semibold text-gray-700 border-b-2 border-transparent hover:border-gray-300" 
-                        onclick="switchTab('user-register')"
+                        data-tab="user-register"
                     >
                         Register
                     </button>
@@ -166,7 +165,7 @@
 
                         <div class="mt-4 text-center text-sm text-gray-600">
                             Already have an account? 
-                            <a onclick="switchTab('user-login')" class="text-green-600 hover:text-green-700 font-medium cursor-pointer">
+                            <a data-tab="user-login" class="text-green-600 hover:text-green-700 font-medium cursor-pointer">
                                 Login here
                             </a>
                         </div>
@@ -178,18 +177,27 @@
             </div>
         </div>
 
-        <!-- Footer -->
-        <footer class="bg-white border-t mt-auto">
-            <div class="max-w-7xl mx-auto px-4 py-6 text-center text-gray-600 text-sm">
-                <p>&copy; 2025 EcoTrack. All rights reserved.</p>
-                <div class="mt-3 space-x-4">
-                    <a href="{{ url_for('pages.index') }}" class="text-gray-600 hover:text-green-600">Home</a>
-                    <a href="#" class="text-gray-600 hover:text-green-600">About</a>
-                    <a href="#" class="text-gray-600 hover:text-green-600">Contact</a>
-                    <a href="#" class="text-gray-600 hover:text-green-600">Privacy Policy</a>
+    <footer class="site-footer py-10 w-full">
+        <div class="container mx-auto flex flex-col items-center text-center space-y-4">
+            <div class="flex items-center space-x-2">
+                <div class="site-secondary-bg rounded-full p-1">
+                    <img src="{{ url_for('static', filename='img/EcotrackLogo.png') }}" alt="EcoTrack" class="w-8 h-8 rounded-full object-cover" />
                 </div>
+                <span class="text-2xl font-bold">EcoTrack</span>
             </div>
-        </footer>
+            <h2 class="text-xl font-bold italic">"Track Change, Make Impact"</h2>
+            <div class="text-sm space-y-1 accent-text">
+                <p>&copy; 2025 Group 5 – DBMS & Advance Computer Programing School Project</p>
+                <p class="font-bold creator-text">Created by: Sapuay | Semira | Caguimbal | De Chavez</p>
+            </div>
+            <a href="{{ url_for('pages.resources_view') }}" class="resources-link italic hover:text-white hover:underline flex items-center font-semibold mt-4 transition duration-150">
+                Resources & Credits
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 ml-2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                </svg>
+            </a>
+        </div>
+    </footer>
     </div>
 {% endblock %}
 

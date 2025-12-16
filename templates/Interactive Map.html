@@ -14,7 +14,7 @@
 {% block content %}
 <body class="selection:bg-yellow-100 selection:text-gray-900">
     <div id="map-view-app">
-      <header class="header-bg p-4 flex justify-between items-center shadow-lg">
+      <header style="background: #104F17; border-bottom: 4px solid var(--accent); color: white;" class="p-4 flex justify-between items-center shadow-lg">
         <div class="flex items-center space-x-4">
           <a
             href="{{ url_for('pages.index') }}"
@@ -22,7 +22,7 @@
           >
             ← Back to MainPage
           </a>
-          <span class="text-cyan-700 text-xl font-bold tracking-wide"
+          <span class="text-white text-xl font-bold tracking-wide"
             >EcoTrack Batangas Map</span
           >
         </div>
@@ -120,6 +120,31 @@
         ← Back to Map View
       </button>
     </div>
+
+    <footer style="background: #104F17; color: #fff;">
+      <div class="max-w-7xl mx-auto py-4 px-6">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+          <div class="text-center md:text-left">
+            <p class="text-sm">
+              &copy; 2023 EcoTrack. All rights reserved.
+            </p>
+          </div>
+          <div class="mt-4 md:mt-0">
+            <a
+              href="#"
+              class="text-sm hover:underline"
+              >Privacy Policy</a
+            >
+            <span class="mx-2">|</span>
+            <a
+              href="#"
+              class="text-sm hover:underline"
+              >Terms of Service</a
+            >
+          </div>
+        </div>
+      </div>
+    </footer>
 
     <script src="{{ url_for('static', filename='js/map.js') }}"></script>
 {% endblock %}

@@ -1,0 +1,4 @@
+[
+  {"username":"admin","action_type":"login","description":"Admin logged in","ip_address":"192.168.1.10","created_at":"2025-12-01T09:00:00Z"},
+  {"username":"jsantos","action_type":"submit_sighting","description":"Submitted a sighting for Philippine Duck","ip_address":"192.168.1.11","created_at":"2025-12-01T09:15:00Z"}
+]

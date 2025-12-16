@@ -11,12 +11,12 @@ from database import init_db, create_tables
 # Import blueprints
 from routes.pages import pages
 from routes.auth import auth
-from routes.api_species import api_species
-from routes.api_locations import api_locations
-from routes.api_sightings import api_sightings
-from routes.api_reports import api_reports
-from routes.api_dashboard import api_dashboard
-from routes.api_admin import api_admin
+from routes.species import api_species
+from routes.locations import api_locations
+from routes.sightings import api_sightings
+from routes.reports import api_reports
+from routes.dashboard import api_dashboard
+from routes.admin import api_admin
 
 
 def create_app():

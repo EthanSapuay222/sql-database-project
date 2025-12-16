@@ -1,0 +1,4 @@
+[
+  {"location_city_name":"Batangas City","report_type":"pollution","severity":"Critical","status":"pending","title":"Illegal Waste Dumping at Batangas City Port","description":"Large amounts of industrial waste dumped near port.","reporter_name":"Juan Dela Cruz","reporter_contact":"09170001111","report_date":"2025-11-20"},
+  {"location_city_name":"Taal","report_type":"deforestation","severity":"High","status":"in_progress","title":"Deforestation in Taal Watershed","description":"Unauthorized tree cutting observed in protected watershed.","reporter_name":"Maria Santos","reporter_contact":"09170002222","report_date":"2025-11-18"}
+]
