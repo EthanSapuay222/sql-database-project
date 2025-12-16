@@ -1,8 +1,6 @@
 from database import db  # Import db from database.py
 from datetime import datetime, timedelta
 
-
-
 # SPECIES MODEL
 
 class Species(db.Model):

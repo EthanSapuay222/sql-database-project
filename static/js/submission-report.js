@@ -1,5 +1,3 @@
-// Submission Report Configuration and Initialization
-
 // Fetch and populate locations from database for environmental report
 async function loadLocations() {
   try {
@@ -189,7 +187,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (result.success) {
           showMessage('Report submitted successfully! Thank you for your contribution.', 'success');
           
-          // Reset form after 2 seconds
+          // Reset form
           setTimeout(function() {
             reportForm.reset();
             messageBox.classList.add('hidden');

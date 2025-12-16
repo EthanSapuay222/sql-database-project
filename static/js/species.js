@@ -1,9 +1,7 @@
-// Life on Land and Water - Tab Switching & Modal
+// Tab Switching & Modal
 
 document.addEventListener('DOMContentLoaded', function() {
-  // ============================================
   // TAB SWITCHING
-  // ============================================
   const tabButtons = document.querySelectorAll('.tab-btn');
   const landSpecies = document.getElementById('land-species');
   const waterSpecies = document.getElementById('water-species');
@@ -30,9 +28,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // ============================================
+
   // MODAL FUNCTIONALITY
-  // ============================================
+
   const modal = document.getElementById('species-modal');
   const modalClose = document.getElementById('modal-close');
   const animalCards = document.querySelectorAll('.animal-card');

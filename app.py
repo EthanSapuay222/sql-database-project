@@ -1,8 +1,3 @@
-"""
-EcoTrack Application
-Main Flask application with modular blueprint architecture
-"""
-
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_wtf.csrf import CSRFProtect
@@ -36,7 +31,7 @@ def create_app():
     # Initialize database
     init_db(app)
     
-    # Initialize CSRF protection - disabled for API endpoints via configuration
+    # Initialize CSRF protection
     app.config['WTF_CSRF_CHECK_DEFAULT'] = False
     csrf = CSRFProtect(app)
     
@@ -53,7 +48,7 @@ def create_app():
             if request.path == '/' and 'user_id' in session:
                 session.clear()
     
-    # Exempt all /api/ routes from CSRF by setting flag
+    # Exempt all /api/ routes from CSRF by flaggiing them here
     @app.before_request
     def disable_csrf_for_api():
         """Disable CSRF token validation for API routes"""

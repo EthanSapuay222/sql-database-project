@@ -8,8 +8,7 @@ from database import db, create_tables
 from datetime import date, timedelta
 import random
 
-
-# SECTION 1: LOCATIONS DATA
+# LOCATIONS DATA
 
 SAMPLE_LOCATIONS = [
     # CITIES
@@ -51,7 +50,7 @@ SAMPLE_LOCATIONS = [
     {'city_name': 'Tuy', 'latitude': 14.0167, 'location_type': 'municipality', 'longitude': 120.7333, 'severity_level': 'Low'},
 ]
 
-# SECTION 2: REPORT CATEGORIES DATA
+# REPORT CATEGORIES DATA
 
 SAMPLE_CATEGORIES = [
     {'name': 'Pollution', 'description': 'Air, water, soil, or noise pollution'},
@@ -61,7 +60,7 @@ SAMPLE_CATEGORIES = [
     {'name': 'Other', 'description': 'Other environmental concerns'},
 ]
 
-# SECTION 3: REPORT SEVERITY LEVELS DATA
+# REPORT SEVERITY LEVELS DATA
 
 SAMPLE_SEVERITY = [
     {'level': 'Low', 'description': 'Minor environmental impact, non-urgent'},
@@ -70,7 +69,7 @@ SAMPLE_SEVERITY = [
     {'level': 'Critical', 'description': 'Severe impact, immediate action required'},
 ]
 
-# SECTION 4: SPECIES DATA
+# SPECIES DATA
 
 LAND_SPECIES = [
     # Birds
@@ -350,7 +349,7 @@ WATER_SPECIES = [
     },
 ]
 
-# SECTION 5: SAMPLE ANIMAL SIGHTINGS DATA
+# SAMPLE ANIMAL SIGHTINGS DATA
 
 SAMPLE_SIGHTINGS = [
     {
@@ -435,7 +434,7 @@ SAMPLE_SIGHTINGS = [
     },
 ]
 
-# SECTION 6: SAMPLE REPORTS DATA
+# SAMPLE REPORTS DATA
 
 SAMPLE_REPORTS = [
     {
@@ -530,10 +529,10 @@ SAMPLE_REPORTS = [
     }
 ]
 
-# SEEDING FUNCTIONS
+# SEEDING
 
 def seed_locations():
-    """Seed locations table with upsert logic (insert or update)"""
+    """Seed locations table logic (insert or update)"""
     inserted = 0
     updated = 0
 

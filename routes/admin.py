@@ -103,7 +103,7 @@ def update_admin_report(report_id):
         return jsonify({'success': False, 'message': 'Unauthorized'}), 403
     
     try:
-        # Debug: Log request details
+        # Debug: request details
         print(f"DEBUG: PUT request to /api/admin/reports/{report_id}")
         print(f"DEBUG: Content-Type: {request.content_type}")
         print(f"DEBUG: Raw data: {request.get_data(as_text=True)}")
@@ -120,7 +120,7 @@ def update_admin_report(report_id):
             print("DEBUG: No data received!")
             return jsonify({'success': False, 'message': 'No data provided'}), 400
         
-        # Update fields
+        # Update the fields
         if 'title' in data:
             report.title = data['title']
         if 'description' in data:
