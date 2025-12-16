@@ -6,6 +6,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/FP.css') }}" />
 <link rel="stylesheet" href="{{ url_for('static', filename='css/about.css') }}" />
 {% endblock %}
+<!-- Page head: shared FP styles and about-specific CSS -->
 
 {% block content %}
 <body class="min-h-screen antialiased">
@@ -31,6 +32,7 @@
       </div>
     </header>
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <!-- Content area: sections for SDG 14 and 15 with team info -->
       <section class="mb-16 text-center">
         <h2 class="text-5xl font-bold text-gray-800 mb-4">
           Group 5 Focuses On SDG 14 & 15
@@ -68,6 +70,7 @@
       </section>
 
       <section id="sdg14" class="mb-16">
+        <!-- SDG 14 section: details and targets related to marine conservation -->
         <div
           class="bg-white shadow-2xl rounded-xl p-8 sdg-card-14 transition duration-300 hover:shadow-3xl"
         >
@@ -113,6 +116,7 @@
       </section>
 
       <section id="sdg15" class="mb-16">
+        <!-- SDG 15 section: details and targets related to terrestrial ecosystems -->
         <div
           class="bg-white shadow-2xl rounded-xl p-8 sdg-card-15 transition duration-300 hover:shadow-3xl"
         >

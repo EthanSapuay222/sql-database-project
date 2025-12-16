@@ -7,43 +7,23 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/FP.css') }}" />
 <link rel="stylesheet" href="{{ url_for('static', filename='css/submission-report.css') }}" />
 {% endblock %}
+<!-- Page head: fonts and styles used for the submission report page -->
 
 {% block content %}
 <body class="min-h-screen flex flex-col items-center">
-    <header
-      style="background: #083316;" class="w-full shadow-md border-b-2 border-b-[#f0e7d0] relative"
-    >
-      <div
-        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between"
-      >
-        <a
-          href="{{ url_for('pages.index') }}"
-          class="absolute left-4 top-1/2 transform -translate-y-1/2 text-sm text-[#F2DB8F] hover:underline"
-        >
-          <- Back to Main Page
-        </a>
-
-        <div class="flex items-center text-[#4b553c] font-extrabold text-xl">
-          <svg
-            class="h-6 w-6 mr-2"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0h6m-6 0h-2a1 1 0 00-1 1v-5a1 1 0 011-1h2z"
-            />
-          </svg>
-          EcoTrack
+    <!-- Submission Report page: choose type of report and submit details -->
+    <header style="background: #104F17; border-bottom: 4px solid var(--accent); color: white;" class="site-header shadow-lg w-full">
+      <a href="{{ url_for('pages.index') }}" class="site-left">
+        <div class="site-logo" style="background: var(--secondary); border: 2px solid var(--accent);">
+          <img src="{{ url_for('static', filename='img/EcotrackLogo.png') }}" class="w-full h-full object-cover" />
         </div>
-        <h2
-          class="text-2xl font-extrabold text-[#b44141] uppercase tracking-wider"
-        >
-          Report Submission
-        </h2>
+        <span class="site-title ml-3">EcoTrack</span>
+      </a>
+      <div class="site-center">
+          <h1 class="site-page-title">Report Submission</h1>
+      </div>
+      <div class="site-right">
+        <a href="{{ url_for('pages.index') }}" class="bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg text-sm transition duration-150">← Back to Main Page</a>
       </div>
     </header>
 
@@ -58,6 +38,7 @@
       </h1>
 
       <!-- Tab Navigation -->
+      <!-- Tabs: switch between Environmental report and Animal sighting forms -->
       <div class="flex border-b border-gray-300 mb-6">
         <button
           id="tab-environmental"
@@ -73,9 +54,10 @@
         </button>
       </div>
 
-      <!-- Environmental Report Form -->
+      <!-- Environmental Report Form: gathers data about environmental incidents -->
       <div id="form-environmental" class="form-container">
         <form id="report-form" class="space-y-6">
+        <!-- Form collects environmental report details and is handled by JS -->
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <div>
           <label
@@ -170,9 +152,10 @@
       </form>
       </div>
 
-      <!-- Animal Sighting Form -->
+      <!-- Animal Sighting Form: collects species sightings, counts, and observer contact -->
       <div id="form-sighting" class="form-container hidden">
         <form id="sighting-form" class="space-y-6">
+          <!-- Form captures sighting information and submits via JS -->
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
           <div>
             <label
@@ -301,12 +284,14 @@
         </form>
       </div>
 
+      <!-- Message box: shows success or error messages after submission -->
       <div
         id="message-box"
         class="mt-4 p-3 text-center rounded-lg hidden"
         role="alert"
       ></div>
 
+      <!-- Footer area: displays page and user status info -->
       <div
         class="mt-8 pt-4 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center text-sm"
       >

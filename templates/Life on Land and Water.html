@@ -6,6 +6,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/FP.css') }}" />
 <link rel="stylesheet" href="{{ url_for('static', filename='css/species.css') }}" />
 {% endblock %}
+<!-- Page head: loads shared site styles and species-specific layout rules -->
 
 {% block content %}
 <body>
@@ -35,6 +36,7 @@
     </header>
 
     <div class="container">
+      <!-- Species container: tabs to switch between land and water species galleries -->
       <!-- Tab Navigation -->
       <div class="species-tabs">
         <button class="tab-btn active" data-category="land">
@@ -52,6 +54,7 @@
       </div>
 
       <!-- Land Species Grid -->
+      <!-- Each species card includes data attributes used by JS to populate the detail modal -->
       <div id="land-species" class="species-gallery">
         {% for species in land_species %}
         <div class="animal-card" 
@@ -93,6 +96,7 @@
       </div>
 
       <!-- Water Species Grid -->
+      <!-- Similar structure to land grid but initially hidden until user toggles tab -->
       <div id="water-species" class="species-gallery" style="display: none;">
         {% for species in water_species %}
         <div class="animal-card"
@@ -135,6 +139,7 @@
     </div>
 
     <!-- Species Detail Modal -->
+    <!-- Modal is populated dynamically by `js/species.js` when a user clicks 'View Details' -->
     <div id="species-modal" class="modal-overlay">
       <div class="modal-content">
         <button class="modal-close" id="modal-close">
@@ -212,6 +217,7 @@
       </div>
     </div>
 
+    <!-- Footer: small CTA to explore more content across the site -->
     <footer style="background: #104F17; color: #fff;">
       <p>Explore more about the Life on Land & Life on Water.</p>
     </footer>

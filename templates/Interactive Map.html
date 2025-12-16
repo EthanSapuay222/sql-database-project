@@ -10,10 +10,12 @@
 <script src="https://unpkg.com/leaflet.icon.glyph/Leaflet.Icon.Glyph.js"></script>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/map.css') }}" />
 {% endblock %}
+<!-- Map page head: loads map libraries, fonts and page styles -->
 
 {% block content %}
 <body class="selection:bg-yellow-100 selection:text-gray-900">
     <div id="map-view-app">
+      <!-- Interactive map application container: map controls, filters and legend live here -->
       <header style="background: #104F17; border-bottom: 4px solid var(--accent); color: white;" class="p-4 flex justify-between items-center shadow-lg">
         <div class="flex items-center space-x-4">
           <a
@@ -29,6 +31,7 @@
       </header>
 
       <main class="p-6 md:p-10 max-w-7xl mx-auto">
+        <!-- Main map area: title, filters and the map container where Leaflet will render tiles -->
         <h2 class="text-2xl md:text-3xl font-bold mb-4 text-gray-800">
           Interactive Map view
         </h2>
@@ -53,6 +56,7 @@
           id="map-container"
           class="map-container relative overflow-hidden p-0 flex items-center justify-center"
         ></div>
+        <!-- `#map-container` is the target element for the Leaflet map instance created by `js/map.js` -->
 
         <div
           class="flex flex-wrap justify-center space-x-6 mt-8 p-4 bg-white rounded-xl shadow-md"
@@ -93,6 +97,7 @@
       id="dashboard-view-app"
       class="dashboard-view max-w-4xl mx-auto my-12 hidden"
     >
+      <!-- Optional dashboard panel for detailed city reports; toggled via JS when user wants deeper analysis -->
       <svg
         class="mx-auto h-16 w-16 text-green-500"
         fill="none"
@@ -121,6 +126,7 @@
       </button>
     </div>
 
+    <!-- Footer: simple site-level footer with legal links -->
     <footer style="background: #104F17; color: #fff;">
       <div class="max-w-7xl mx-auto py-4 px-6">
         <div class="flex flex-col md:flex-row justify-between items-center">

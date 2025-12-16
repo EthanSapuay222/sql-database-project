@@ -1,15 +1,20 @@
 <!doctype html>
+<!-- Base layout: provides head includes and blocks for page-specific content -->
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}EcoTrack{% endblock %}</title>
+    <!-- Page title block: override this in templates to set the browser tab text -->
     <script src="{{ url_for('static', filename='js/tailwind-config.js') }}"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     {% block head %}{% endblock %}
+    <!-- `head` block: add page-specific styles or meta tags here -->
   </head>
   <body>
     {% block content %}{% endblock %}
+    <!-- `content` block: each page should render its main HTML content here -->
     {% block scripts %}{% endblock %}
+    <!-- `scripts` block: include page-specific JS here so it's loaded after the content -->
   </body>
 </html>
