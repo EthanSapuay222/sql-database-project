@@ -1,0 +1,32 @@
+{% macro render_header(page_title=None, left_html=None, right_html=None, subtitle=None, extra_classes='') %}
+<header class="site-header shadow-lg {{ extra_classes }}">
+  <div class="site-left">
+    {% if left_html %}
+      {{ left_html | safe }}
+    {% endif %}
+    <a href="{{ url_for('pages.index') }}" class="site-left-link">
+      <div class="site-logo" style="background: var(--secondary); border: 2px solid var(--accent);">
+        <img src="{{ url_for('static', filename='img/EcotrackLogo.png') }}" class="w-full h-full object-cover" alt="EcoTrack Logo" />
+      </div>
+      <span class="site-title">EcoTrack</span>
+    </a>
+  </div>
+
+  {% if page_title %}
+    <div class="site-page-title">
+      <div class="title-text">{{ page_title }}</div>
+      {% if subtitle %}
+        <div class="site-subtitle">{{ subtitle }}</div>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <div class="site-right">
+    {% if right_html %}
+      {{ right_html | safe }}
+    {% else %}
+      <a href="{{ url_for('auth.logout') }}" class="px-4 py-2 rounded-lg font-semibold transition duration-150 hover:bg-red-800" style="background:#dc2626;color:#fff;">Logout</a>
+    {% endif %}
+  </div>
+</header>
+{% endmacro %}

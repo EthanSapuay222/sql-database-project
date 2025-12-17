@@ -12,20 +12,8 @@
 {% block content %}
 <body class="min-h-screen flex flex-col items-center">
     <!-- Submission Report page: choose type of report and submit details -->
-    <header style="background: #104F17; border-bottom: 4px solid var(--accent); color: white;" class="site-header shadow-lg w-full">
-      <a href="{{ url_for('pages.index') }}" class="site-left">
-        <div class="site-logo" style="background: var(--secondary); border: 2px solid var(--accent);">
-          <img src="{{ url_for('static', filename='img/EcotrackLogo.png') }}" class="w-full h-full object-cover" />
-        </div>
-        <span class="site-title ml-3">EcoTrack</span>
-      </a>
-      <div class="site-center">
-          <h1 class="site-page-title">Report Submission</h1>
-      </div>
-      <div class="site-right">
-        <a href="{{ url_for('pages.index') }}" class="bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg text-sm transition duration-150">← Back to Main Page</a>
-      </div>
-    </header>
+{% from '_header.html' import render_header %}
+{{ render_header(page_title='Report Submission', right_html='<a href="' ~ url_for('pages.index') ~ '" class="bg-gray-700 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg text-sm transition duration-150">← Back to Main Page</a>') }}
 
     <div
       id="submission-card"

@@ -1,0 +1,21 @@
+<footer style="background: #104F17; color: #fff; border-top: 4px solid var(--accent);" class="py-10 w-full">
+  <div class="container mx-auto flex flex-col items-center text-center space-y-4">
+    <div class="flex items-center space-x-2">
+      <div style="background: var(--secondary);" class="rounded-full p-1">
+        <img src="{{ url_for('static', filename='img/EcotrackLogo.png') }}" alt="EcoTrack" class="w-8 h-8 rounded-full object-cover" />
+      </div>
+      <span class="text-2xl font-bold">EcoTrack</span>
+    </div>
+    <h2 class="text-xl font-bold italic">"Track Change, Make Impact"</h2>
+    <div class="text-sm space-y-1" style="color: var(--accent);">
+      <p>&copy; 2025 Group 5 – DBMS & Advance Computer Programing School Project</p>
+      <p class="font-bold" style="color: #fff;">Created by: Sapuay | Semira | Caguimbal | De Chavez</p>
+    </div>
+    <a href="{{ url_for('pages.resources_view') }}" style="color: var(--secondary);" class="italic hover:text-white hover:underline flex items-center font-semibold mt-4 transition duration-150">
+      Resources & Credits
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 ml-2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+      </svg>
+    </a>
+  </div>
+</footer>

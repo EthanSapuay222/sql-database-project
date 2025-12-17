@@ -1,0 +1,49 @@
+from flask import Blueprint, render_template, current_app, flash, redirect, url_for
+from flask_login import login_required
+from models import Species
+
+animals = Blueprint('animals', __name__)
+
+
+@animals.route("/wildlife")
+@login_required
+def list_animals():
+    try:
+        all_species = Species.query.order_by(Species.status_name, Species.name).all()
+
+        if not all_species:
+            flash('No species found in the database. Please check back later.', 'info')
+
+        return render_template('animals.html', title='Wildlife Directory', species_list=all_species)
+
+    except Exception as e:
+        current_app.logger.error(f'Error loading species list: {str(e)}')
+        flash('An error occurred while loading the wildlife directory.', 'danger')
+        return redirect(url_for('pages.home'))
+
+
+@animals.route("/wildlife/<int:species_id>")
+@login_required
+def animal_detail(species_id):
+    """Displays the detail page for a single species."""
+    try:
+        current_species = Species.query.get_or_404(species_id)
+        threat_list = current_species.threats.all()
+        habitat_list = current_species.habitats.all()
+        fact_list = current_species.fun_facts.order_by('fact_id').all()
+
+        current_app.logger.info(f'Species detail page viewed: {current_species.name}')
+
+        return render_template(
+            'animal_page.html', 
+            title=current_species.name, 
+            species=current_species,
+            threats=threat_list,
+            habitats=habitat_list,
+            facts=fact_list
+        )
+
+    except Exception as e:
+        current_app.logger.error(f'Error loading species detail {species_id}: {str(e)}')
+        flash('An error occurred while loading species details.', 'danger')
+        return redirect(url_for('animals.list_animals'))

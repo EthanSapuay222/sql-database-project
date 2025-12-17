@@ -3,6 +3,7 @@
 {% block title %}EcoTrack - Resources and Credits{% endblock %}
 
 {% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/FP.css') }}" />
 <link rel="stylesheet" href="{{ url_for('static', filename='css/resources-credits.css') }}" />
 {% endblock %}
 <!-- Page head: resources & credits stylesheet -->
@@ -11,40 +12,8 @@
 <body class="min-h-screen flex flex-col" style="background: #fff;">
     <!-- Resources & Credits page: lists image credits and reference links -->
     <!-- Top Navigation/Header Banner -->
-    <header style="background: #104F17; border-bottom: 4px solid var(--accent); color: white;" class="p-4 flex justify-between items-center shadow-lg">
-      <div
-        class="max-w-7xl mx-auto flex justify-between items-center px-4 sm:px-6 lg:px-8"
-      >
-        <!-- Back Link -->
-        <a
-          href="{{ url_for('pages.index') }}"
-          class="text-gray-800 text-sm hover:underline transition duration-150 ease-in-out font-medium"
-        >
-          &larr; Back to mainpage
-        </a>
-
-        <!-- Logo / App Title -->
-        <div class="flex items-center space-x-2">
-          <!-- Simple stylized 'E' logo/icon using Tailwind colors -->
-          <svg
-            class="w-6 h-6 text-teal-500"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              fill-rule="evenodd"
-              d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-8a1 1 0 00-1 1v3a1 1 0 102 0v-3a1 1 0 00-1-1zM9 7a1 1 0 011-1h1a1 1 0 110 2h-1a1 1 0 01-1-1z"
-              clip-rule="evenodd"
-            ></path>
-          </svg>
-          <span class="text-xl font-bold text-white">EcoTrack</span>
-        </div>
-
-        <!-- Placeholder for alignment -->
-        <div class="w-36"></div>
-      </div>
-    </header>
+    {% from '_header.html' import render_header %}
+{{ render_header(page_title='Resources & Credits', right_html='<a href="' ~ url_for('pages.index') ~ '" class="back-blue">← Back to Main Page</a>') }}
 
     <!-- Main Content Area -->
     <main class="flex-grow flex justify-center items-start pt-12 p-4">

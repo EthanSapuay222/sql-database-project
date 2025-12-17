@@ -30,14 +30,15 @@ body {
 }
 /* Para to sa View Life on Land And Water*/
 :root {
-  --primary: #4B872B;      /* Main header/footer, strong accent */
-  --secondary: #fff;       /* Sidebar, secondary backgrounds, buttons now white */
-  --accent: #fff;          /* Card backgrounds, highlights now white */
-  --light: #fff;           /* Light background now white */
-  --text: #104F17;         /* Deep green for text */
+  --primary: #4B872B;      /* Main accent */
+  --secondary: #fff;       /* Secondary backgrounds, buttons */
+  --accent: #fff;          /* Highlights */
+  --light: #fff;           /* Light background */
+  --text: #104F17;         /* Deep green text */
   --highlight: #78A33D;    /* Main buttons, nav, accents */
-  --dark: #083316;         /* For footer, header, or backgrounds */
-  --hover: #266B1C;        /* For hover states */
+  --dark: #083316;         /* Very dark green */
+  --hover: #266B1C;        /* Hover states */
+  --header-bg: #104F17;    /* Header background to keep consistent dark green */
 }
 
 * {
@@ -53,12 +54,162 @@ body {
   line-height: 1.6;
 }
 
-header {
-  background: linear-gradient(to right, var(--primary), var(--secondary));
+.site-header {
+  background: var(--header-bg); /* consistent dark green */
   color: white;
-  text-align: center;
-  padding: 2rem 1rem;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.6rem 1rem;
   position: relative;
+  border-bottom: 4px solid var(--accent);
+  width: 100%;
+}
+
+/* Responsive: stack columns on narrow screens */
+@media (max-width: 640px) {
+  .site-header {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .site-right {
+    justify-self: center;
+  }
+}
+
+.site-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.site-left-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.site-logo {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  flex: 0 0 40px;
+  border-radius: 9999px;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--secondary);
+  border: 2px solid var(--accent);
+}
+.site-logo img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  display: block;
+}
+
+.site-title {
+  color: white;
+  font-weight: 800;
+  font-size: 1.25rem;
+}
+
+.site-page-title {
+  /* Center visually by absolutely positioning in the header on wide screens */
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--secondary);
+  padding: 0.25rem 0;
+  max-width: min(60ch, calc(100% - 260px));
+  z-index: 1;
+}
+
+.site-page-title .title-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.site-subtitle {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.92);
+  opacity: 0.95;
+  margin-top: 0.125rem;
+}
+
+/* Ensure left/right controls are above the centered title */
+.site-left, .site-right { z-index: 2; }
+
+/* Revert to normal flow on small screens where header stacks */
+@media (max-width: 640px) {
+  .site-page-title {
+    position: static;
+    transform: none;
+    top: auto;
+    left: auto;
+    max-width: 100%;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+  }
+  .site-left, .site-right { z-index: auto; }
+}
+
+.site-left-link { justify-self: start; }
+.site-right { justify-self: end; display: flex; align-items: center; gap: 0.5rem; }
+.site-right .back-button { margin-left: 0; }
+
+/* Ensure header has enough vertical space so titles don't overlap */
+.site-header {
+  min-height: 56px;
+}
+
+/* Dashboard gets a larger centered title */
+.dashboard-header .site-page-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+@media (max-width: 640px) {
+  .site-page-title {
+    white-space: normal;
+    max-width: 100%;
+    font-size: 1rem;
+  }
+}
+
+.site-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.site-right a {
+  color: var(--secondary);
+  text-decoration: none;
+}
+
+@media (max-width: 480px) {
+  .site-logo {
+    width: 32px;
+    height: 32px;
+  }
+  .site-title {
+    font-size: 1rem;
+  }
+  .site-page-title {
+    font-size: 1rem;
+  }
 }
 
 h1 {
@@ -151,32 +302,39 @@ footer {
 
 /* Back to Mainpage Button Styles */
 .back-button {
-  position: absolute;
-  top: 20px;
-  left: 20px;
+  /* Default behavior: inline element suitable for header or content */
+  position: relative;
   background-color: var(--light);
   color: var(--primary);
   border: none;
-  padding: 10px 20px;
+  padding: 8px 14px;
   border-radius: 5px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
+  transition: all 0.2s ease;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
 }
 
 .back-button:hover {
   background-color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
 }
 
 .back-button:active {
   transform: translateY(0);
 }
+
+/* If an absolute-positioned back-button is required elsewhere, add class .back-button-absolute */
+.back-button-absolute {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+}
+
 
 @media (max-width: 768px) {
   .species-grid {
@@ -197,3 +355,26 @@ footer {
   }
 }
 /*Para to sa Dashboard*/
+
+/* Blue back button used across pages */
+.back-blue {
+  /* Match Interactive Map back button: bg-gray-700 / hover bg-gray-600 */
+  background-color: #374151; /* Tailwind gray-700 */
+  color: #ffffff;
+  border: none;
+  padding: 0.5rem 1rem; /* px-4 py-2 */
+  border-radius: 0.5rem; /* rounded-lg */
+  font-weight: 600; /* font-medium */
+  font-size: 0.875rem; /* text-sm */
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.15s ease, transform 0.06s ease;
+}
+.back-blue:hover {
+  background-color: #4b5563; /* Tailwind gray-600 */
+  transform: translateY(-1px);
+}
+.back-blue:active { transform: translateY(0); }
+.back-blue.small { padding: 6px 10px; font-size: 0.875rem; }

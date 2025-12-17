@@ -10,30 +10,8 @@
 
 {% block content %}
 <body>
-    <header style="background: #104F17; border-bottom: 4px solid var(--accent); color: white;" class="p-4 flex justify-between items-center shadow-lg">
-      <a class="back-button" href="{{ url_for('pages.index') }}">
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 16 16"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M10 12L6 8L10 4"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
-        Back to Mainpage
-      </a>
-      <h1 style="color: white;">LIFE ON LAND & LIFE ON WATER</h1>
-      <div class="subtitle">
-        Exploring the Diversity of Terrestrial and Aquatic Species
-      </div>
-    </header>
+    {% from '_header.html' import render_header %}
+  {{ render_header(page_title='LIFE ON LAND & LIFE ON WATER', right_html='<a class="back-blue" href="' ~ url_for('pages.index') ~ '">← Back to Main Page</a>', subtitle='Exploring the Diversity of Terrestrial and Aquatic Species') }}
 
     <div class="container">
       <!-- Species container: tabs to switch between land and water species galleries -->
@@ -216,11 +194,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Footer: small CTA to explore more content across the site -->
-    <footer style="background: #104F17; color: #fff;">
-      <p>Explore more about the Life on Land & Life on Water.</p>
-    </footer>
 
     <script src="{{ url_for('static', filename='js/species.js') }}"></script>
 {% endblock %}

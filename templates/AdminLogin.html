@@ -13,13 +13,13 @@
 {% block content %}
 <div id="app-container" class="min-h-screen flex flex-col" style="background: #fff;">
     <!-- Main page container: centers content vertically and sets the page background -->
-    <header style="background: #104F17; border-bottom: 4px solid var(--accent); color: white;" class="p-4 flex justify-between items-center shadow-lg">
-        <div class="flex items-center space-x-3">
-            <div style="background: var(--secondary); border: 2px solid var(--accent);" class="w-10 h-10 rounded-full flex items-center justify-center">
-                <img src="{{ url_for('static', filename='img/EcotrackLogo.png') }}" class="w-full h-full object-cover rounded-full" alt="EcoTrack Logo" />
+    <header class="site-header shadow-lg">
+        <a href="{{ url_for('pages.index') }}" class="site-left-link">
+            <div class="site-logo" style="background: var(--secondary); border: 2px solid var(--accent);">
+                <img src="{{ url_for('static', filename='img/EcotrackLogo.png') }}" class="w-full h-full object-cover" alt="EcoTrack Logo" />
             </div>
-            <span style="color: white;" class="font-extrabold text-2xl tracking-wider">EcoTrack</span>
-        </div>
+            <span class="site-title">EcoTrack</span>
+        </a>
     </header>
 
     <div class="flex-1 flex items-center justify-center">

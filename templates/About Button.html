@@ -10,27 +10,8 @@
 
 {% block content %}
 <body class="min-h-screen antialiased">
-    <header style="background: #104F17; border-bottom: 4px solid var(--accent); color: white;" class="p-4 flex justify-between items-center shadow-lg">
-      <div
-        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center"
-      >
-        <h1 class="text-3xl font-extrabold text-white tracking-tight">
-          Sustainable Development Goals
-        </h1>
-        <nav class="hidden md:block">
-          <a
-            href="#sdg14"
-            class="text-blue-600 hover:text-blue-800 font-medium px-3 py-2 transition duration-150 ease-in-out rounded-lg"
-            >SDG 14: Water</a
-          >
-          <a
-            href="#sdg15"
-            class="text-green-600 hover:text-green-800 font-medium px-3 py-2 ml-4 transition duration-150 ease-in-out rounded-lg"
-            >SDG 15: Land</a
-          >
-        </nav>
-      </div>
-    </header>
+    {% from '_header.html' import render_header %}
+{{ render_header(page_title='Sustainable Development Goals', right_html='<nav class="hidden md:block"><a href="#sdg14" class="text-blue-600 hover:text-blue-800 font-medium px-3 py-2 transition duration-150 ease-in-out rounded-lg">SDG 14: Water</a><a href="#sdg15" class="text-green-600 hover:text-green-800 font-medium px-3 py-2 ml-4 transition duration-150 ease-in-out rounded-lg">SDG 15: Land</a></nav>') }}
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <!-- Content area: sections for SDG 14 and 15 with team info -->
       <section class="mb-16 text-center">
@@ -180,15 +161,7 @@
           sustainable and greater future.
         </p>
     </main>
-  </body>
-{% endblock %}
+      </body>
+    {% endblock %}
 
-{% block scripts %}{% endblock %}
-
-<footer style="background: #104F17; color: #fff;">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center">
-    <p class="text-sm text-white">
-      &copy; 2023 Group 5. All rights reserved.
-    </p>
-  </div>
-</footer>
+    {% block scripts %}{% endblock %}

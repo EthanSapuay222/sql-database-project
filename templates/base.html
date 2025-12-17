@@ -15,6 +15,7 @@
     {% block content %}{% endblock %}
     <!-- `content` block: each page should render its main HTML content here -->
     {% block scripts %}{% endblock %}
+    {% block footer %}{% include '_footer.html' %}{% endblock %}
     <!-- `scripts` block: include page-specific JS here so it's loaded after the content -->
   </body>
 </html>

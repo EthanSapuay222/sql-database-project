@@ -4,6 +4,7 @@
 
 {% block head %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/FP.css') }}" />
 <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}" />
 {% endblock %}
 <!-- Head: loads Chart.js for charts and dashboard-specific styles -->
@@ -11,33 +12,8 @@
 {% block content %}
 <body class="min-h-screen" style="background: #fff;">
   <!-- Dashboard layout: shows summary stats, charts and recent activity for admins or managers -->
-    <header style="background: #104F17; border-bottom: 4px solid var(--accent); color: white;" class="p-4 flex justify-between items-center shadow-lg">
-      <a href="{{ url_for('pages.index') }}" class="flex items-center space-x-4 cursor-pointer">
-        <div
-          class="h-10 w-10 bg-white rounded-full flex items-center justify-center overflow-hidden border-2 border-white"
-        >
-          <img
-            src="{{ url_for('static', filename='img/EcotrackLogo.png') }}"
-            alt="EcoTrack Logo"
-            class="w-full h-full object-cover rounded-full"
-          />
-        </div>
-        <span id="logo-text" class="text-xl font-semibold text-white"
-          >EcoTrack</span
-        >
-      </a>
-      <h1
-        class="text-3xl font-bold text-gray-800 tracking-wider text-green-700"
-      >
-        Dashboard Page
-      </h1>
-      <a
-        href="{{ url_for('pages.index') }}"
-        class="px-4 py-2 bg-brand-card text-white rounded-lg hover:bg-opacity-90 transition duration-150 ease-in-out font-medium shadow-md"
-      >
-        Back to Main Page
-      </a>
-    </header>
+    {% from '_header.html' import render_header %}
+{{ render_header(page_title='Dashboard Page', right_html='<a href="' ~ url_for('pages.index') ~ '" class="back-blue">← Back to Main Page</a>', extra_classes='dashboard-header') }}
 
     <main class="main-dashboard-grid">
       <!-- Main grid: left panel for stats, right panel for charts -->
@@ -120,23 +96,7 @@
       </div>
     </section>
 
-    <footer style="background: #104F17; color: #fff;">
-      <div class="max-w-7xl mx-auto py-4 px-8">
-        <div class="flex flex-col md:flex-row items-center justify-between">
-          <div class="text-center md:text-left">
-            <p class="text-sm">
-              &copy; 2023 EcoTrack. All rights reserved.
-            </p>
-          </div>
-          <div class="mt-2 md:mt-0">
-            <a href="#" class="text-sm hover:underline">Privacy Policy</a>
-            <span class="text-gray-500 mx-2">|</span>
-            <a href="#" class="text-sm hover:underline">Terms of Service</a>
-          </div>
-        </div>
-      </div>
-    </footer>
-</body>
+  </body>
 {% endblock %}
 
 {% block scripts %}
